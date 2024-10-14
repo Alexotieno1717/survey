@@ -4,13 +4,11 @@ import SurveyList from '@/components/survey/surveyList';
 import {
   ArrowTrendingUpIcon,
   ClipboardDocumentListIcon,
-  PlusCircleIcon
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import HeaderCards from "@/components/headerCards";
 import {ClipboardDocumentCheckIcon} from "@heroicons/react/24/solid";
 import React from "react";
-import { ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/solid';
 import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
 
 export default function CreateSurvey() {
