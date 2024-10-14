@@ -18,7 +18,7 @@ interface SurveyCardProps {
     };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-4 border border-gray-100">
+    <div className="bg-white rounded-lg shadow-md p-2 md:p-3 mb-4 border border-gray-100">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 space-y-1 md:space-y-0">
         <div>
             <p className='hidden md:block text-sm text-gray-400 pb-0 md:pb-6'>Survey title</p>
