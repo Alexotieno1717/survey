@@ -20,7 +20,7 @@ const navigation = [
 	},
 	{
 		title: "Surveys",
-		url: "/dashboard/survey/create",
+		url: "/dashboard/survey",
 		icon: (
 			<ClipboardDocumentCheckIcon className="w-6 h-6 transition duration-75 group-hover:text-gray-900" />
 		),

@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
+import React, { SetStateAction, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
@@ -155,12 +155,22 @@ export default function CreateSurvey() {
                   <ErrorMessage name="description" component="div" className="text-red-500" />
                 </div>
 
+                <hr />
+
+                <div className="flex items-end justify-end space-x-3">
                 <button
-                  type="submit"
-                  className="px-4 py-2 mt-4 text-white rounded-md bg-survey-green"
-                >
-                  Next
-                </button>
+                    type="submit"
+                    className="px-4 py-2 mt-4 rounded-md bg-white border"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 mt-4 text-white rounded-md bg-survey-green"
+                  >
+                    Next
+                  </button>
+                </div>
               </Form>
             )}
           </Formik>
