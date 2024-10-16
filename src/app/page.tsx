@@ -10,6 +10,7 @@ import HeaderCards from "@/components/headerCards";
 import {ClipboardDocumentCheckIcon} from "@heroicons/react/24/solid";
 import React from "react";
 import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
+import HomeSurveysCards from "@/components/home/homeSurveysCards";
 
 export default function CreateSurvey() {
 
@@ -62,8 +63,10 @@ export default function CreateSurvey() {
               </Link>
             </div>
 
-            <div>
-              <SurveyList/>
+            <div className=' bg-white shadow border rounded-lg border-gray-50 py-6 px-4 space-y-6'>
+              {Array.from({ length: 5 }).map((_, i) => (
+                  <HomeSurveysCards key={i} />
+              ))}
             </div>
 
           </div>
@@ -103,9 +106,9 @@ export default function CreateSurvey() {
               <h4>Question (5)</h4>
 
               <div className=' space-y-6'>
-                <div className='flex justify-between'>
+                <div className='flex flex-col md:flex-row justify-between'>
                   <h2>1. How Satisfied are you with our product?</h2>
-                  <div className='flex space-x-3'>
+                  <div className='flex pt-4 md:pt-0 space-x-3'>
                     <p className='px-2 md:px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-800'>single choice</p>
                     <PencilSquareIcon className='w-5 h-5 text-survey-green'/>
                     <TrashIcon className='w-5 h-5 text-red-500'/>
@@ -115,9 +118,9 @@ export default function CreateSurvey() {
               </div>
 
               <div className=' space-y-6'>
-                <div className='flex justify-between'>
+                <div className='flex flex-col md:flex-row justify-between'>
                   <h2>2. How likely are you to recommend our product/service to others?</h2>
-                  <div className='flex space-x-3'>
+                  <div className='flex pt-4 md:pt-0 space-x-3'>
                     <p className='px-2 md:px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-800'>Multiple
                       choice</p>
                     <PencilSquareIcon className='w-5 h-5 text-survey-green'/>
@@ -125,15 +128,6 @@ export default function CreateSurvey() {
                   </div>
                 </div>
                 <hr/>
-                <div className="flex items-end justify-end">
-                  <button
-                      type="button"
-                      className="flex items-center px-2 py-2 mt-4 rounded-md space-x-2 bg-survey-green text-white"
-                  >
-                    <PlusCircleIcon className="w-5 h-5"/>
-                    <span>Add Question</span>
-                  </button>
-                </div>
               </div>
             </div>
           </div>
