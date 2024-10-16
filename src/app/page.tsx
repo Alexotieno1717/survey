@@ -1,9 +1,8 @@
 "use client"
 
-import SurveyList from '@/components/survey/surveyList';
 import {
   ArrowTrendingUpIcon,
-  ClipboardDocumentListIcon, PencilIcon, PencilSquareIcon, PlusCircleIcon, TrashIcon,
+  ClipboardDocumentListIcon, PencilSquareIcon, TrashIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import HeaderCards from "@/components/headerCards";
