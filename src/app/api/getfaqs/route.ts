@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {NextResponse} from "next/server";
 
-export default async function handler() {
+export async function GET() {
     try {
         const url = `http://165.22.46.7:3003/api/faqs`;
         const response = await axios.get(url);

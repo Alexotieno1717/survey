@@ -25,6 +25,13 @@ const navigation = [
 			<ClipboardDocumentCheckIcon className="w-6 h-6 transition duration-75 group-hover:text-gray-900" />
 		),
 	},
+	{
+		title: "Ai Survey",
+		url: "/dashboard/open-ai-survey",
+		icon: (
+			<ClipboardDocumentCheckIcon className="w-6 h-6 transition duration-75 group-hover:text-gray-900" />
+		),
+	},
 ];
 
 const SideBar = () => {

@@ -238,28 +238,36 @@ export default function CreateSurvey() {
               </div>
             ))}
 
-            <div>
-              <button
-                type="button"
-                className="flex px-2 py-2 mt-4 rounded-md space-x-2 text-blue-400"
-                onClick={handleAddQuestion}
+            <div className='flex space-x-3'>
+              <select
+                  className="h-10 border border-input bg-white px-3 py-2 text-sm rounded-[8px] ring-offset-background placeholder-text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <PlusCircleIcon className="w-5 h-5" /> 
-                <span>Add Question</span>
+                <option value="">Pick Question</option>
+                <option value="1">Rate our Service?</option>
+                <option value="2">Are you satisfied by our products/service?</option>
+                <option value="3">How likely are you to recommend our product/service to others?</option>
+              </select>
+              <button
+                  type="button"
+                  className="flex px-2 py-2 rounded-md space-x-2 text-blue-400"
+                  onClick={handleAddQuestion}
+              >
+                <PlusCircleIcon className="w-5 h-5"/>
+                <span>Create Next Question</span>
               </button>
             </div>
 
             <button
-              onClick={() => setStep(1)}
-              className="px-4 py-2 mt-4 rounded-md bg-white border"
+                onClick={() => setStep(1)}
+                className="px-4 py-2 mt-4 rounded-md bg-white border"
             >
               Previous
             </button>
 
             <button
-              type="button"
-              onClick={handleFinalSubmit}
-              className="px-4 py-2 mt-4 ml-2 text-white rounded-md bg-survey-green"
+                type="button"
+                onClick={handleFinalSubmit}
+                className="px-4 py-2 mt-4 ml-2 text-white rounded-md bg-survey-green"
             >
               Submit
             </button>
