@@ -1,6 +1,7 @@
 "use client";
 
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import {Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import {Button} from "@/components/ui/button";
 
 type SurveyModalProps = {
     isOpen: boolean; // `isOpen` should be a boolean indicating if the modal is visible.
@@ -60,19 +61,8 @@ const SurveyModal = ({ isOpen, onClose }: SurveyModalProps  ) => {
 
                         {/* Actions */}
                         <div className="flex justify-end space-x-4 pt-4">
-                            <button
-                                type="button"
-                                className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg"
-                                onClick={onClose}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                className="px-4 py-2 text-white bg-survey-green rounded-lg"
-                            >
-                                Proceed Creating Survey
-                            </button>
+                            <Button variant={'outline'} onClick={onClose}>Cancel</Button>
+                            <Button type="submit">Proceed Creating Survey</Button>
                         </div>
                     </form>
                 </DialogPanel>
