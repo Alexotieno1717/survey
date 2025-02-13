@@ -1,11 +1,11 @@
 "use client"
 
 import {useEffect, useState} from "react";
-import SurveyModal from "@/components/survey/SurveyModal";
-import {PlusCircleIcon} from "@heroicons/react/24/outline";
 import {Disclosure} from "@headlessui/react";
 import clsx from "clsx";
-import {ChevronDownIcon} from "@heroicons/react/16/solid";
+import SurveyModal from "@/components/survey/SurveyModal";
+import {ChevronDownIcon, PlusCircleIcon} from "lucide-react";
+import {Button} from "@/components/ui/button";
 
 interface ContentProps {
     question: string;
@@ -43,21 +43,21 @@ const OpenAiSurvey = () => {
     }, []);
 
     return (
-        <>
+        <div className="pt-8 mt-12 space-y-4 bg-white md:p-4">
             <SurveyModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
             />
 
-            <div className="px-4 md:px-14 pt-12">
+            <div className="">
                 <div className="flex justify-end pb-10">
-                    <button
-                        className="flex gap-2 px-4 md:px-6 py-2 md:py-3 text-white rounded-lg bg-survey-green"
+                    <Button
                         onClick={() => setIsModalOpen(true)}
+                        className='flex space-x-2'
                     >
                         <PlusCircleIcon className="h-6 w-6" />
-                        Create Survey With AI
-                    </button>
+                        <span>Create Survey With AI</span>
+                    </Button>
                 </div>
 
                 <hr className="pb-10" />
@@ -133,7 +133,7 @@ const OpenAiSurvey = () => {
                     </Disclosure>
                 ))}
             </div>
-        </>
+        </div>
     );
 };
 

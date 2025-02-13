@@ -1,139 +1,123 @@
-"use client"
+import NotFound from "@/components/notfound/notFound";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import { redirect } from 'next/navigation'
 
-import {
-  ArrowTrendingUpIcon,
-  ClipboardDocumentListIcon, PencilSquareIcon, TrashIcon,
-} from '@heroicons/react/24/outline';
-import Link from 'next/link';
-import HeaderCards from "@/components/headerCards";
-import {ClipboardDocumentCheckIcon} from "@heroicons/react/24/solid";
-import React from "react";
-import { ArrowRightCircleIcon } from '@heroicons/react/24/solid';
-import HomeSurveysCards from "@/components/home/homeSurveysCards";
+export default function Home() {
 
-export default function CreateSurvey() {
-
-  const headerCardsContents = [
-    {
-      'icon': <ClipboardDocumentCheckIcon className='w-6 h-6' />,
-      'title': 'Total Survey',
-      'totalNumber': '50',
-    },
-    {
-      'icon': <ClipboardDocumentListIcon className='w-6 h-6' />,
-      'title': 'Survey Responses',
-      'totalNumber': '150',
-    },
-    {
-      'icon': <ArrowTrendingUpIcon className='w-6 h-6' />,
-      'title': 'Completed Survey',
-      'totalNumber': '350',
-    },
-  ]
-
+  redirect('/dashboard/home')
   return (
-    <>
-      <div className='px-2 md:px-14 pt-12'>
-
-        <h1 className='text-3xl font-bold pb-4'>Analytic Insight</h1>
-
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          {headerCardsContents.map((item, index) => (
-              <HeaderCards
-                  key={index}
-                  icon={item.icon}
-                  title={item.title}
-                  totalNumber={item.totalNumber}
-              />
-          ))}
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
+        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+          Get started by editing&nbsp;
+          <code className="font-mono font-bold">src/app/page.tsx</code>
+        </p>
+        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
+          <a
+            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
+            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            By{" "}
+            <Image
+              src="/vercel.svg"
+              alt="Vercel Logo"
+              className="dark:invert"
+              width={100}
+              height={24}
+              priority
+            />
+          </a>
         </div>
-
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4 pt-12'>
-
-          {/* View   */}
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className='text-xl md:text-2xl font-bold text-center'>Recent Surveys</h2>
-              <Link href='/dashboard/survey'>
-                <button className='flex gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg text-survey-green hover:underline'>
-                  View all Survey
-                  <ArrowRightCircleIcon className='h-6 w-6'/>
-                </button>
-              </Link>
-            </div>
-
-            <div className=' bg-white shadow border rounded-lg border-gray-50 py-6 px-4 space-y-6'>
-              {Array.from({ length: 5 }).map((_, i) => (
-                  <HomeSurveysCards key={i} />
-              ))}
-            </div>
-
-          </div>
-
-          {/* Recent Created survey */}
-          <div>
-            <div>
-              <div className="flex items-center mb-6">
-                <h2 className='text-xl md:text-2xl font-bold text-center'>Survey - Questions</h2>
-              </div>
-            </div>
-
-            <div className="p-2 md:p-3 mb-4">
-              <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4 space-y-1 md:space-y-0">
-                <div>
-                  <p className='hidden md:block text-sm text-gray-400 pb-0 md:pb-6'>Survey title</p>
-                  <h4 className="text-sm  md:text-lg font-semibold flex space-x-4"><span>Customer Satisfaction Survey 2024</span>
-                    <PencilSquareIcon className='w-5 h-5 text-survey-green'/></h4>
-                </div>
-                <div className='flex flex-row space-x-2 md:space-x-0 md:flex-col'>
-                  <p className='text-sm text-gray-400 pb-0 md:pb-6'>Question</p>
-                  <span className='px-2 md:px-3 py-1 rounded-full text-xs'>5</span>
-                </div>
-                <div className='flex flex-row space-x-2 md:space-x-0 md:flex-col'>
-                  <p className='text-sm text-gray-400 pb-0 md:pb-6'>Total responses:</p>
-                  <span className="text-gray-600 text-sm">  3</span>
-                </div>
-                <div className='hidden md:block'>
-                  <p className='text-sm text-gray-400 pb-0 md:pb-6'>Date</p>
-                  <span className="text-gray-400 text-sm">3-01-2024</span>
-                </div>
-              </div>
-            </div>
-
-            <div className='p-2 md:p-8 mb-4 rounded-lg border border-gray-100  space-y-6'>
-
-              <h4>Question (5)</h4>
-
-              <div className=' space-y-6'>
-                <div className='flex flex-col md:flex-row justify-between'>
-                  <h2>1. How Satisfied are you with our product?</h2>
-                  <div className='flex pt-4 md:pt-0 space-x-3'>
-                    <p className='px-2 md:px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-800'>single choice</p>
-                    <PencilSquareIcon className='w-5 h-5 text-survey-green'/>
-                    <TrashIcon className='w-5 h-5 text-red-500'/>
-                  </div>
-                </div>
-                <hr/>
-              </div>
-
-              <div className=' space-y-6'>
-                <div className='flex flex-col md:flex-row justify-between'>
-                  <h2>2. How likely are you to recommend our product/service to others?</h2>
-                  <div className='flex pt-4 md:pt-0 space-x-3'>
-                    <p className='px-2 md:px-3 py-1 rounded-full text-xs bg-gray-200 text-gray-800'>Multiple
-                      choice</p>
-                    <PencilSquareIcon className='w-5 h-5 text-survey-green'/>
-                    <TrashIcon className='w-5 h-5 text-red-500'/>
-                  </div>
-                </div>
-                <hr/>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
       </div>
-    </>
+
+      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
+        <Image
+          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
+          src="/next.svg"
+          alt="Next.js Logo"
+          width={180}
+          height={37}
+          priority
+        />
+      </div>
+
+      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
+        <a
+          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <h2 className="mb-3 text-2xl font-semibold">
+            Docs{" "}
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className="m-0 max-w-[30ch] text-sm opacity-50">
+            Find in-depth information about Next.js features and API.
+          </p>
+        </a>
+
+        <a
+          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <h2 className="mb-3 text-2xl font-semibold">
+            Learn{" "}
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className="m-0 max-w-[30ch] text-sm opacity-50">
+            Learn about Next.js in an interactive,e course with&nbsp;quizzes!
+          </p>
+        </a>
+
+        <a
+          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <h2 className="mb-3 text-2xl font-semibold">
+            Templates{" "}
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className="m-0 max-w-[30ch] text-sm opacity-50">
+            Explore starter templates for Next.js.
+          </p>
+        </a>
+
+        <a
+          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <h2 className="mb-3 text-2xl font-semibold">
+            Deploy{" "}
+            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+              -&gt;
+            </span>
+          </h2>
+          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
+            Instantly deploy your Next.js site to a shareable URL with Vercel.
+          </p>
+        </a>
+      </div>
+      <div>
+        <Button>Click Me</Button>
+      </div>
+
+      <NotFound title="Survey" pathToCreate={'/create'}  />
+    </main>
   );
 }
