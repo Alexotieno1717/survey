@@ -4,15 +4,7 @@ import { ErrorMessage, Field, Form, Formik, FieldArray } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 import {TriangleAlert} from "lucide-react";
-
-// Define a type for the question structure
-interface Question {
-    question: string;
-    responseType: "free-text" | "multiple-choice";
-    options: string[];
-    allowMultiple: boolean;
-    freeTextDescription: "", // New field for free-text explanation
-}
+import { QuestionProps } from "@/types";
 
 const questionSchema = Yup.object().shape({
     question: Yup.string().required("Question is required"),
@@ -33,9 +25,9 @@ const CreateQuestion = () => {
     const router = useRouter();
 
     // Explicitly define the type of the questions state
-    const [questions, setQuestions] = useState<Question[]>([]);
+    const [questions, setQuestions] = useState<QuestionProps[]>([]);
 
-    const handleAddQuestion = (values: Question, { resetForm }: any) => {
+    const handleAddQuestion = (values: QuestionProps, { resetForm }: any) => {
         setQuestions([...questions, values]);
         resetForm();
     };
