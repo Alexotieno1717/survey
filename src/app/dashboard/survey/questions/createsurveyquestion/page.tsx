@@ -7,7 +7,6 @@ import {cn} from "@/lib/utils";
 import {format} from "date-fns";
 import {CalendarIcon, MoveLeft, MoveRight, Trash2, TriangleAlert} from "lucide-react";
 import DatePicker from "@/components/common/DatePicker";
-import {useRouter} from "next/navigation";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
 
@@ -19,6 +18,12 @@ interface Question {
     freeTextDescription?: string;
 }
 
+interface Recipient {
+    id: string;
+    name: string;
+    email: string;
+}
+
 interface FormValues {
     surveyName: string;
     description: string;
@@ -26,7 +31,10 @@ interface FormValues {
     endDate: string;
     triggerWord: string;
     questions: Question[];
-    completionMessage: string;
+    completionMessage?: string;
+    recipients: Recipient[];
+    invitationMessage: string;
+    scheduleTime: string;
 }
 
 const initialValues: FormValues = {
@@ -43,6 +51,15 @@ const initialValues: FormValues = {
         freeTextDescription: '',
     }],
     completionMessage: '',
+    recipients: [
+        {
+            'id': '1',
+            'name': 'Alex Otieno',
+            'email': 'alex@example.com',
+        }
+    ],
+    invitationMessage: '',
+    scheduleTime: '',
 };
 
 const validationSchema = Yup.object().shape({
@@ -70,16 +87,20 @@ const validationSchema = Yup.object().shape({
             freeTextDescription: Yup.string().notRequired(),
         })
     ),
+    completionMessage: Yup.string().notRequired(),
 });
 
 
 
 const Page = () => {
-    const [form, setForm] = useState<0 | 1 | 2 | number>(0);
+    // const [form, setForm] = useState<0 | 1 | 2 | number>(0);
+
+    const [currentStep, setCurrentStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Survey Details, 1: Questions, 2: Survey Outro, 3: Send Survey
+    const [sendSurveyStep, setSendSurveyStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Add Recipients, 1: Review Recipients, 2: Invitation, 3: Send
 
     const handleFormStep = (step: number) => {
-        if (step < 3){
-            setForm(step);
+        if (step < 4) {
+            setCurrentStep(step);
         }
     }
 
@@ -89,8 +110,8 @@ const Page = () => {
         values: FormikValues,
         setFieldValue: (field: string, value: any) => void,
     ) {
-        switch (form) {
-            case 0:
+        switch (currentStep) {
+            case 0: // Survey Details
                 return (
                     <>
                         <div className=''>
@@ -215,7 +236,7 @@ const Page = () => {
                     </>
                 );
 
-            case 1:
+            case 1: // Questions
                 return (
                     <>
                         <div className=''>
@@ -240,8 +261,8 @@ const Page = () => {
                                             />
                                             {/*{errors.questions?.[index]?.question && touched.questions?.[index]?.question ? (*/}
                                                 <span className="text-sm text-red-500">
-                                        <ErrorMessage name={`questions[${index}].question`} />
-                                    </span>
+                                                    <ErrorMessage name={`questions[${index}].question`} />
+                                                </span>
                                             {/*) : null}*/}
                                         </div>
 
@@ -486,7 +507,7 @@ const Page = () => {
                     </>
                 );
 
-            case 2:
+            case 2:  // Survey Outro
                 return (
                     <>
                         <div>
@@ -495,22 +516,177 @@ const Page = () => {
                                 This message will be sent to participants after they answer their last question.
                             </p>
 
+                            {/* Completion Message Textarea */}
                             <Field
                                 as="textarea"
                                 name="completionMessage"
                                 placeholder="E.g. Thank you for taking the time to complete our survey! Your feedback is invaluable to us and helps us improve."
                                 className="w-full p-3 border rounded-md focus:ring-1 focus:ring-blue-500 focus:outline-none"
                                 rows={4}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                                    // Reset save state when the user edits the message
+                                    if (values.isCompletionMessageSaved) {
+                                        setFieldValue("isCompletionMessageSaved", false);
+                                    }
+                                    // Update the completion message
+                                    setFieldValue("completionMessage", e.target.value);
+                                }}
                             />
                             <ErrorMessage name="completionMessage" component="div" className="text-xs pt-2 text-red-500" />
 
-                            <div className="flex justify-between text-center items-center mt-2 ">
-                                <p className='text-sm text-gray-400'>{values.completionMessage?.length || 0} characters 1 message(s). GSM 7 Encoding.</p>
-                                <Button variant="secondary">Save Message</Button>
+                            {/* Character Count and Save Button */}
+                            <div className="flex justify-between text-center items-center text-xs text-gray-500 mt-2">
+                                <p>{values.completionMessage?.length || 0} characters</p>
+                                <Button
+                                    type="button"
+                                    variant={values.isCompletionMessageSaved ? "secondary" : "default"} // Blue when not saved, gray when saved
+                                    onClick={async () => {
+                                        // Mark completion message as saving
+                                        setFieldValue("isSavingCompletionMessage", true);
+
+                                        // Simulate saving (e.g., API call)
+                                        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                                        // Mark completion message as saved
+                                        setFieldValue("isSavingCompletionMessage", false);
+                                        setFieldValue("isCompletionMessageSaved", true);
+                                    }}
+                                    disabled={values.isCompletionMessageSaved} // Disable button after saving
+                                >
+                                    {values.isSavingCompletionMessage ? "Saving..." : "Save Message"}
+                                </Button>
                             </div>
                         </div>
                     </>
-                )
+                );
+
+            case 3: // Send Survey
+                switch (sendSurveyStep) {
+                    case 0: // Add Recipients
+                        return (
+                            <div>
+                                <h1 className="font-bold text-lg pb-4">Add Survey Participants</h1>
+                                <hr className="mb-6" />
+
+                                <div className="flex space-x-4 mb-6">
+                                    <Button
+                                        type="button"
+                                        variant={"outline"}
+                                        className="flex-1"
+                                    >
+                                        Select from contacts list
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={"outline"}
+                                        className="flex-1"
+                                    >
+                                        Upload file
+                                    </Button>
+                                </div>
+
+                                <div className="mb-6">
+                                    <label className="block text-sm text-[#25262d] font-medium">Select Survey Participants from your contacts list</label>
+                                    <div className="mt-2">
+                                        <label className="inline-flex items-center">
+                                            <Field
+                                                type="radio"
+                                                name="recipients"
+                                                value="all"
+                                                className="form-radio"
+                                            />
+                                            <span className="ml-2">All contacts (1)</span>
+                                        </label>
+                                        <label className="inline-flex items-center ml-6">
+                                            <Field
+                                                type="radio"
+                                                name="recipients"
+                                                value="select"
+                                                className="form-radio"
+                                            />
+                                            <span className="ml-2">Select Survey Participants</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 1: // Review Recipients
+                        return (
+                            <div>
+                                <h1 className="font-bold text-lg pb-4">Review Recipients</h1>
+                                <hr className="mb-6" />
+
+                                {/* Display recipients in a table */}
+                                <table className="">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Alex Otieno</td>
+                                        <td>alex@gmail.com</td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        );
+
+                    case 2: // Invitation
+                        return (
+                            <div>
+                                <h1 className="font-bold text-lg pb-4">Compose Invitation</h1>
+                                <hr className="mb-6" />
+
+                                {/* Invitation Message Textarea */}
+                                <div className="mb-6">
+                                    <label className="block text-sm text-[#25262d] font-medium">Invitation Message</label>
+                                    <Field
+                                        as="textarea"
+                                        name="invitationMessage"
+                                        className="w-full px-4 py-2 mt-2 border rounded-md"
+                                        rows={4}
+                                    />
+                                </div>
+
+                                {/* Schedule Time Picker */}
+                                <div className="mb-6">
+                                    <label className="block text-sm text-[#25262d] font-medium">Schedule Time</label>
+                                    <Field
+                                        type="datetime-local"
+                                        name="scheduleTime"
+                                        className="w-full px-4 py-2 mt-2 border rounded-md"
+                                    />
+                                </div>
+                            </div>
+                        );
+
+                    case 3: // Send
+                        return (
+                            <div>
+                                <h1 className="font-bold text-lg pb-4">Review and Send</h1>
+                                <hr className="mb-6" />
+
+                                {/* Display invitation details */}
+                                <div className="mb-6">
+                                    <h2 className="text-lg font-semibold">Invitation Message</h2>
+                                    <p>{values.invitationMessage}</p>
+                                </div>
+
+                                <div className="mb-6">
+                                    <h2 className="text-lg font-semibold">Scheduled Time</h2>
+                                    <p>{values.scheduleTime}</p>
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
+                }
 
             default:
                 return null;
@@ -527,10 +703,10 @@ const Page = () => {
         setTouched: (touched: import("formik").FormikTouched<FormValues>, shouldValidate?: boolean | undefined) => Promise<void | import("formik").FormikErrors<FormValues>>,
         errors: FormikErrors<FormValues>
     ) {
-        switch (form) {
+        switch (currentStep) {
             case 0:
                 if (
-                    form === 0 &&
+                    currentStep === 0 &&
                     (!values.surveyName || !values.description || !values.startDate || !values.endDate || !values.triggerWord)
                 ) {
                     validateField('surveyName');
@@ -549,20 +725,20 @@ const Page = () => {
                         true
                     );
                 } else if (
-                    form === 0 &&
+                    currentStep === 0 &&
                     !errors.surveyName &&
                     !errors.description &&
                     !errors.startDate &&
                     !errors.endDate &&
                     !errors.triggerWord
                 ) {
-                    setForm(form + 1);
+                    setCurrentStep(currentStep + 1);
                 }
                 break;
 
             case 1:
                 if (
-                    form === 1 &&
+                    currentStep === 1 &&
                     values.questions.some(question => !question.question || !question.responseType)
                 ) {
                     values.questions.forEach((_, index) => {
@@ -576,15 +752,28 @@ const Page = () => {
                         }))
                     });
                 } else if (
-                    form === 1 &&
+                    currentStep === 1 &&
                     !errors.questions
                 ) {
-                    setForm(form + 1);
+                    setCurrentStep(currentStep + 1);
                 }
                 break;
 
             case 2:
-                // Handle the final step
+                if (!values.completionMessage) {
+                    validateField('completionMessage');
+                    setTouched({ completionMessage: true }, true);
+                } else if (!errors.completionMessage) {
+                    setCurrentStep(currentStep + 1);
+                }
+                break;
+
+            case 3:
+                if (sendSurveyStep < 3) {
+                    setSendSurveyStep(sendSurveyStep + 1);
+                } else {
+                    handleSubmit(values);
+                }
                 break;
 
             default:
@@ -592,10 +781,40 @@ const Page = () => {
         }
     }
 
+    const isStep0Complete = (values: FormValues) => {
+        return (
+            values.surveyName &&
+            values.description &&
+            values.startDate &&
+            values.endDate &&
+            values.triggerWord
+        );
+    };
+
+    const isStep1Complete = (values: FormValues) => {
+        return values.questions.every(
+            (question) =>
+                question.question &&
+                question.responseType &&
+                (question.responseType === "free-text" || question.options.length > 0)
+        );
+    };
+
+    const isStep2Complete = (values: FormValues) => {
+        return values.completionMessage;
+    };
+
+    const isStep3Complete = (values: FormValues) => {
+        return values.recipients.length > 0;
+    };
+
+    const isStep4Complete = (values: FormValues) => {
+        return values.invitationMessage && values.scheduleTime;
+    };
+
+
     return (
-        <div className="pt-8 mt-12 space-y-4  md:p-4">
-            {/*  Indicators  */}
-            <div> indicators</div>
+        <div className="pt-8 mt-12 space-y-4 md:p-4">
             <Formik
                 initialValues={initialValues}
                 onSubmit={handleSubmit}
@@ -610,74 +829,168 @@ const Page = () => {
                       errors,
                       setFieldValue,
                   }) => (
-                    <Form className='bg-white p-6'>
-                        {RenderForm(touched, errors, values, setFieldValue)}
-                        <div className='py-6'>
-                            <Transition
-                                as={"div"}
-                                show={form < 1}
-                                enter="transition-opacity duration-300"
-                                enterFrom="opacity-0"
-                                enterTo="opacity-100"
-                                leave="transition-opacity duration-150"
-                                leaveFrom="opacity-100"
-                                leaveTo="opacity-0"
+                    <>
+                        <div className="flex space-x-4">
+                            <div
+                                className={`px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                                    currentStep === 0
+                                        ? "bg-blue-500 text-white"
+                                        : "bg-white text-gray-500 hover:bg-gray-100"
+                                }`}
+                                onClick={() => setCurrentStep(0)}
                             >
-                                <div className="flex justify-end">
-                                    <Button
-                                        type="button"
-                                        variant={"default"}
-                                        className="px-6 py-3 text-base font-semibold border border-transparent rounded-lg shadow-sm focus:outline-none w-auto space-x-2"
-                                        onClick={() =>
-                                            handleNextStep(values, validateField, setTouched, errors)
-                                        }
-                                    >
-                                        <span>Next</span>
-                                        <MoveRight />
-                                    </Button>
-                                </div>
-                            </Transition>
+                                Survey Details
+                            </div>
 
-                            <Transition
-                                as={"div"}
-                                show={form > 0}
-                                enter="transition-opacity duration-300"
-                                enterFrom="opacity-0"
-                                enterTo="opacity-100"
-                                leave="transition-opacity duration-150"
-                                leaveFrom="opacity-100"
-                                leaveTo="opacity-0"
+                            <div
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                    currentStep === 1
+                                        ? "bg-blue-500 text-white"
+                                        : isStep0Complete(values)
+                                            ? "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                }`}
+                                onClick={() => {
+                                    if (isStep0Complete(values)) {
+                                        setCurrentStep(1);
+                                    }
+                                }}
                             >
-                                <div className="flex justify-end gap-x-4">
-                                    <Button
-                                        type="button"
-                                        className='space-x-2'
-                                        variant={'outline'}
-                                        onClick={() => handleFormStep(form - 1)}
-                                    >
-                                        <MoveLeft />
-                                        <span>Back</span>
-                                    </Button>
-                                    <Button
-                                        variant={"default"}
-                                        className="px-6 py-3 text-base font-semibold border border-transparent rounded-lg shadow-sm focus:outline-none w-auto space-x-2"
-                                        onClick={() =>
-                                            handleNextStep(values, validateField, setTouched, errors)
-                                        }
-                                    >
-                                        {form === 2 ? "Create Survey" : (
-                                            <>
-                                                <span>Next</span>
-                                                <MoveRight />
-                                            </>
-                                        )
-                                        }
-                                    </Button>
-                                </div>
-                            </Transition>
+                                Questions ({values.questions.length})
+                            </div>
+
+                            <div
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                    currentStep === 2
+                                        ? "bg-blue-500 text-white"
+                                        : isStep1Complete(values)
+                                            ? "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                }`}
+                                onClick={() => {
+                                    if (isStep1Complete(values)) {
+                                        setCurrentStep(2);
+                                    }
+                                }}
+                            >
+                                Survey Outro
+                            </div>
+
+                            <div
+                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                    currentStep === 3
+                                        ? "bg-blue-500 text-white"
+                                        : isStep2Complete(values)
+                                            ? "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                }`}
+                                onClick={() => {
+                                    if (isStep2Complete(values)) {
+                                        setCurrentStep(3);
+                                    }
+                                }}
+                            >
+                                Send Survey
+                            </div>
                         </div>
 
-                    </Form>
+                        {currentStep === 3 && (
+                            <div className="flex space-x-4 mt-4">
+                                <div
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                        sendSurveyStep === 0
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                    }`}
+                                    onClick={() => setSendSurveyStep(0)}
+                                >
+                                    Add Recipients
+                                </div>
+
+                                <div
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                        sendSurveyStep === 1
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                    }`}
+                                    onClick={() => setSendSurveyStep(1)}
+                                >
+                                    Review Recipients
+                                </div>
+
+                                <div
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                        sendSurveyStep === 2
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                    }`}
+                                    onClick={() => setSendSurveyStep(2)}
+                                >
+                                    Invitation
+                                </div>
+
+                                <div
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                        sendSurveyStep === 3
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
+                                    }`}
+                                    onClick={() => setSendSurveyStep(3)}
+                                >
+                                    Send
+                                </div>
+                            </div>
+                        )}
+
+                        <Form className='bg-white p-6'>
+                            {RenderForm(touched, errors, values, setFieldValue)}
+                            <div className='py-6'>
+                                <Transition
+                                    as={"div"}
+                                    show={true}
+                                    enter="transition-opacity duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="transition-opacity duration-150"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="flex justify-end gap-x-4">
+                                        {currentStep > 0 && (
+                                            <Button
+                                                type="button"
+                                                className='space-x-2'
+                                                variant={'outline'}
+                                                onClick={() => {
+                                                    if (currentStep === 3 && sendSurveyStep > 0) {
+                                                        setSendSurveyStep(sendSurveyStep - 1);
+                                                    } else {
+                                                        setCurrentStep(currentStep - 1);
+                                                    }
+                                                }}
+                                            >
+                                                <MoveLeft />
+                                                <span>Back</span>
+                                            </Button>
+                                        )}
+                                        <Button
+                                            type="button"
+                                            variant={"default"}
+                                            className="px-6 py-3 text-base font-semibold border border-transparent rounded-lg shadow-sm focus:outline-none w-auto space-x-2"
+                                            onClick={() => handleNextStep(values, validateField, setTouched, errors)}
+                                        >
+                                            {currentStep === 3 && sendSurveyStep === 3 ? "Send Survey" : (
+                                                <>
+                                                    <span>Next</span>
+                                                    <MoveRight />
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </Transition>
+                            </div>
+                        </Form>
+                    </>
                 )}
             </Formik>
         </div>
