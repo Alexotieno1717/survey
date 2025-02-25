@@ -9,6 +9,7 @@ import {CalendarIcon, MoveLeft, MoveRight, Trash2, TriangleAlert} from "lucide-r
 import DatePicker from "@/components/common/DatePicker";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
+import DataTable from "@/components/tables/dataTable";
 
 interface Question {
     question: string;
@@ -92,7 +93,7 @@ const validationSchema = Yup.object().shape({
 
 
 
-const Page = () => {
+const Page =  () => {
     // const [form, setForm] = useState<0 | 1 | 2 | number>(0);
 
     const [currentStep, setCurrentStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Survey Details, 1: Questions, 2: Survey Outro, 3: Send Survey
@@ -130,7 +131,7 @@ const Page = () => {
                                 />
                                 {errors.surveyName && touched.surveyName ? (
                                     <span id="surveyName" className="text-sm text-red-500">
-									<ErrorMessage id="surveyName" name="surveyName" />
+									<ErrorMessage id="surveyName" name="surveyName"/>
 								</span>
                                 ) : null}
                             </div>
@@ -145,7 +146,7 @@ const Page = () => {
                                 />
                                 {errors.description && touched.description ? (
                                     <span id="description" className="text-sm text-red-500">
-									<ErrorMessage id="description" name="description" />
+									<ErrorMessage id="description" name="description"/>
 								</span>
                                 ) : null}
                             </div>
@@ -167,16 +168,16 @@ const Page = () => {
                                                 ) : (
                                                     <span>Pick a date</span>
                                                 )}
-                                                <CalendarIcon className="w-4 h-4 ml-auto opacity-50" />
+                                                <CalendarIcon className="w-4 h-4 ml-auto opacity-50"/>
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
-                                            <DatePicker name="startDate" />
+                                            <DatePicker name="startDate"/>
                                         </PopoverContent>
                                     </Popover>
                                     {errors.startDate && touched.startDate ? (
                                         <span id="startDate" className="text-sm text-red-500">
-                                            <ErrorMessage id="startDate" name="startDate" />
+                                            <ErrorMessage id="startDate" name="startDate"/>
                                         </span>
                                     ) : null}
                                 </div>
@@ -198,7 +199,7 @@ const Page = () => {
                                                     <span>Pick a date</span>
                                                 )}
 
-                                                <CalendarIcon className="w-4 h-4 ml-auto opacity-50" />
+                                                <CalendarIcon className="w-4 h-4 ml-auto opacity-50"/>
                                             </Button>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
@@ -210,7 +211,7 @@ const Page = () => {
                                     </Popover>
                                     {errors.endDate && touched.endDate ? (
                                         <span id="endDate" className="text-sm text-red-500">
-                                            <ErrorMessage id="endDate" name="endDate" />
+                                            <ErrorMessage id="endDate" name="endDate"/>
                                         </span>
                                     ) : null}
                                 </div>
@@ -228,7 +229,7 @@ const Page = () => {
                                 />
                                 {errors.triggerWord && touched.triggerWord ? (
                                     <span id="triggerWord" className="text-sm text-red-500">
-									<ErrorMessage id="triggerWord" name="triggerWord" />
+									<ErrorMessage id="triggerWord" name="triggerWord"/>
 								</span>
                                 ) : null}
                             </div>
@@ -241,9 +242,13 @@ const Page = () => {
                     <>
                         <div className=''>
                             <h1 className="font-bold text-lg pb-4">Create Questions</h1>
-                            <hr className="mb-6" />
+                            <hr className="mb-6"/>
 
-                            {values.questions.map((question: Question & { isSaved?: boolean; isSaving?: boolean; isEditing?: boolean }, index: number) => (
+                            {values.questions.map((question: Question & {
+                                isSaved?: boolean;
+                                isSaving?: boolean;
+                                isEditing?: boolean
+                            }, index: number) => (
                                 <div key={index} className="mt-6">
                                     <div className="flex space-x-6 w-full">
                                         <div className='flex-1 space-y-[6px]'>
@@ -260,8 +265,8 @@ const Page = () => {
                                                 }}
                                             />
                                             {/*{errors.questions?.[index]?.question && touched.questions?.[index]?.question ? (*/}
-                                                <span className="text-sm text-red-500">
-                                                    <ErrorMessage name={`questions[${index}].question`} />
+                                            <span className="text-sm text-red-500">
+                                                    <ErrorMessage name={`questions[${index}].question`}/>
                                                 </span>
                                             {/*) : null}*/}
                                         </div>
@@ -282,8 +287,8 @@ const Page = () => {
                                                 <option value="multiple-choice">Multiple Choice</option>
                                             </Field>
                                             {/*{errors.questions?.[index]?.responseType && touched.questions?.[index]?.responseType ? (*/}
-                                                <span className="text-sm text-red-500">
-                                        <ErrorMessage name={`questions[${index}].responseType`} />
+                                            <span className="text-sm text-red-500">
+                                        <ErrorMessage name={`questions[${index}].responseType`}/>
                                     </span>
                                             {/*) : null}*/}
                                         </div>
@@ -295,11 +300,13 @@ const Page = () => {
                                             <div className="mt-4">
                                                 <label className="block text-sm font-medium">Options</label>
                                                 {question.options.map((option: string, optionIndex: number) => (
-                                                    <div key={optionIndex} className="flex justify-between space-x-10 mt-2 items-center">
+                                                    <div key={optionIndex}
+                                                         className="flex justify-between space-x-10 mt-2 items-center">
                                                         {/* Label with numbering */}
                                                         <div className="flex-1 items-center">
                                                             <div className='flex justify-between'>
-                                                                <span className="text-sm font-medium">Label {optionIndex + 1}</span>
+                                                                <span
+                                                                    className="text-sm font-medium">Label {optionIndex + 1}</span>
                                                                 {/* Remove button as an "X" mark with "Remove" text */}
                                                                 <button
                                                                     type="button"
@@ -323,7 +330,8 @@ const Page = () => {
 
                                                         {/* Branching input for options */}
                                                         <div className="flex-1 space-y-2">
-                                                            <label className="block text-sm font-medium">After child questions, go to:</label>
+                                                            <label className="block text-sm font-medium">After child
+                                                                questions, go to:</label>
                                                             <Field
                                                                 as="select"
                                                                 name={`questions[${index}].branching[${optionIndex}]`}
@@ -343,7 +351,9 @@ const Page = () => {
                                                                     )
                                                                 ))}
 
-                                                                <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>-- No More Options --</option>
+                                                                <option className="disabled:cursor-not-allowed"
+                                                                        value="-2" disabled={true}>-- No More Options --
+                                                                </option>
 
                                                                 {/* End Survey option */}
                                                                 <option value="-1">End Survey</option>
@@ -374,7 +384,8 @@ const Page = () => {
                                                     id={`allowMultiple-${index}`}
                                                     className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
                                                 />
-                                                <label htmlFor={`allowMultiple-${index}`} className="text-sm font-medium">
+                                                <label htmlFor={`allowMultiple-${index}`}
+                                                       className="text-sm font-medium">
                                                     Allow participant to pick more than one option
                                                 </label>
                                             </div>
@@ -395,9 +406,10 @@ const Page = () => {
                                     )}
 
                                     <div className='py-3 space-y-6'>
-                                        <hr />
+                                        <hr/>
                                         <div>
-                                            <label className="block text-sm font-medium">After answer has been submitted, go to:</label>
+                                            <label className="block text-sm font-medium">After answer has been
+                                                submitted, go to:</label>
                                             <Field
                                                 as="select"
                                                 name={`questions[${index}].branching`}
@@ -417,13 +429,15 @@ const Page = () => {
                                                     )
                                                 ))}
 
-                                                <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>-- No questions --</option>
+                                                <option className="disabled:cursor-not-allowed" value="-2"
+                                                        disabled={true}>-- No questions --
+                                                </option>
 
                                                 {/* End Survey option */}
                                                 <option value="-1">End Survey</option>
                                             </Field>
                                         </div>
-                                        <hr />
+                                        <hr/>
                                     </div>
 
                                     <div className="flex items-center justify-between pt-6">
@@ -432,8 +446,9 @@ const Page = () => {
                                             {/* Question Not Saved / Saving Question */}
                                             {(question.isEditing || !question.isSaved) && (
                                                 <div className="flex items-center space-x-2">
-                                                    <TriangleAlert className="w-4 h-4 opacity-50 text-red-500" />
-                                                    <span className={question.isSaving ? "text-yellow-500" : "text-red-500"}>
+                                                    <TriangleAlert className="w-4 h-4 opacity-50 text-red-500"/>
+                                                    <span
+                                                        className={question.isSaving ? "text-yellow-500" : "text-red-500"}>
                                             {question.isSaving ? "Saving Question..." : "Question Not Saved"}
                                         </span>
                                                 </div>
@@ -471,13 +486,13 @@ const Page = () => {
                                                         setFieldValue("questions", newQuestions);
                                                     }}
                                                 >
-                                                    <Trash2 className="w-4 h-4 opacity-50" />
+                                                    <Trash2 className="w-4 h-4 opacity-50"/>
                                                 </button>
                                             )}
                                         </div>
                                     </div>
 
-                                    <hr className='mt-4' />
+                                    <hr className='mt-4'/>
                                 </div>
                             ))}
 
@@ -532,7 +547,8 @@ const Page = () => {
                                     setFieldValue("completionMessage", e.target.value);
                                 }}
                             />
-                            <ErrorMessage name="completionMessage" component="div" className="text-xs pt-2 text-red-500" />
+                            <ErrorMessage name="completionMessage" component="div"
+                                          className="text-xs pt-2 text-red-500"/>
 
                             {/* Character Count and Save Button */}
                             <div className="flex justify-between text-center items-center text-xs text-gray-500 mt-2">
@@ -566,7 +582,7 @@ const Page = () => {
                         return (
                             <div>
                                 <h1 className="font-bold text-lg pb-4">Add Survey Participants</h1>
-                                <hr className="mb-6" />
+                                <hr className="mb-6"/>
 
                                 <div className="flex space-x-4 mb-6">
                                     <Button
@@ -586,7 +602,8 @@ const Page = () => {
                                 </div>
 
                                 <div className="mb-6">
-                                    <label className="block text-sm text-[#25262d] font-medium">Select Survey Participants from your contacts list</label>
+                                    <label className="block text-sm text-[#25262d] font-medium">Select Survey
+                                        Participants from your contacts list</label>
                                     <div className="mt-2">
                                         <label className="inline-flex items-center">
                                             <Field
@@ -615,9 +632,13 @@ const Page = () => {
                         return (
                             <div>
                                 <h1 className="font-bold text-lg pb-4">Review Recipients</h1>
-                                <hr className="mb-6" />
+                                <hr className="mb-6"/>
 
                                 {/* Display recipients in a table */}
+                                <div className="">
+                                    {/*<DataTable />*/}
+                                </div>
+
                                 <table className="">
                                     <thead>
                                     <tr>
@@ -638,19 +659,33 @@ const Page = () => {
 
                     case 2: // Invitation
                         return (
-                            <div>
+                            <div className='space-y-6'>
                                 <h1 className="font-bold text-lg pb-4">Compose Invitation</h1>
-                                <hr className="mb-6" />
+                                <p className='text-gray-500 text-sm'>
+                                    Compose an invitation message for opting into your survey and schedule the time you want it to be sent in this step.
+                                </p>
+                                <hr className="mb-6"/>
 
                                 {/* Invitation Message Textarea */}
                                 <div className="mb-6">
-                                    <label className="block text-sm text-[#25262d] font-medium">Invitation Message</label>
+                                    <label className="block text-sm text-[#25262d] font-medium">Invitation
+                                        Message</label>
                                     <Field
                                         as="textarea"
                                         name="invitationMessage"
                                         className="w-full px-4 py-2 mt-2 border rounded-md"
                                         rows={4}
+                                        placeholder="Reply with START to participate"
                                     />
+                                </div>
+
+                                <div className='text-xs text-gray-500 space-y-6'>
+                                    <p>
+                                        This message contains the following additional characters for Safaricom recipients: STOP*456*9*5#
+                                    </p>
+                                    <p>
+                                        {values.invitationMessage.length || 0} characters  1 message(s) . GSM 7 Encoding
+                                    </p>
                                 </div>
 
                                 {/* Schedule Time Picker */}
@@ -669,7 +704,7 @@ const Page = () => {
                         return (
                             <div>
                                 <h1 className="font-bold text-lg pb-4">Review and Send</h1>
-                                <hr className="mb-6" />
+                                <hr className="mb-6"/>
 
                                 {/* Display invitation details */}
                                 <div className="mb-6">
@@ -762,7 +797,7 @@ const Page = () => {
             case 2:
                 if (!values.completionMessage) {
                     validateField('completionMessage');
-                    setTouched({ completionMessage: true }, true);
+                    setTouched({completionMessage: true}, true);
                 } else if (!errors.completionMessage) {
                     setCurrentStep(currentStep + 1);
                 }
@@ -969,7 +1004,7 @@ const Page = () => {
                                                     }
                                                 }}
                                             >
-                                                <MoveLeft />
+                                                <MoveLeft/>
                                                 <span>Back</span>
                                             </Button>
                                         )}
@@ -982,7 +1017,7 @@ const Page = () => {
                                             {currentStep === 3 && sendSurveyStep === 3 ? "Send Survey" : (
                                                 <>
                                                     <span>Next</span>
-                                                    <MoveRight />
+                                                    <MoveRight/>
                                                 </>
                                             )}
                                         </Button>

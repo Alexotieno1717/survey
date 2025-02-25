@@ -52,6 +52,33 @@ export const menuGroups = [
             { label: "Ai Survey", route: "/dashboard/survey/open-ai-survey" }
           ],
         },
+        {
+          icon: (
+              <svg
+                  width="24"
+                  height="25"
+                  viewBox="0 0 24 25"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                    d="M22 21.2998V19.2998C22 17.436 20.7252 15.8699 19 15.4258M15.5 3.59056C16.9659 4.18395 18 5.62112 18 7.2998C18 8.97849 16.9659 10.4157 15.5 11.009M17 21.2998C17 19.436 17 18.5042 16.6955 17.7691C16.2895 16.789 15.5108 16.0103 14.5307 15.6043C13.7956 15.2998 12.8638 15.2998 11 15.2998H8C6.13623 15.2998 5.20435 15.2998 4.46927 15.6043C3.48915 16.0103 2.71046 16.789 2.30448 17.7691C2 18.5042 2 19.436 2 21.2998M13.5 7.2998C13.5 9.50894 11.7091 11.2998 9.5 11.2998C7.29086 11.2998 5.5 9.50894 5.5 7.2998C5.5 5.09067 7.29086 3.2998 9.5 3.2998C11.7091 3.2998 13.5 5.09067 13.5 7.2998Z"
+                    stroke="currentColor"
+                    className=" group-hover:stroke-white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                />
+              </svg>
+          ),
+          label: "Phonebook",
+          route: "",
+          children: [
+            { label: "Contact Groups", route: "/dashboard/phonebook/contactgroups" },
+            { label: "Contacts", route: "/dashboard/phonebook/contacts" },
+            { label: "Contact Group Maps", route: "/dashboard/phonebook/contactgroupmaps" }
+          ],
+        }
       ],
     },
   ];
