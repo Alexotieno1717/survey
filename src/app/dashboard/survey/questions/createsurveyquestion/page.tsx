@@ -9,7 +9,6 @@ import {CalendarIcon, MoveLeft, MoveRight, Trash2, TriangleAlert} from "lucide-r
 import DatePicker from "@/components/common/DatePicker";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
-import DataTable from "@/components/tables/dataTable";
 
 interface Question {
     question: string;
