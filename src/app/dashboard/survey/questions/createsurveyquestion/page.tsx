@@ -12,12 +12,14 @@ import {Transition} from "@headlessui/react";
 import DataTable from "@/components/tables/dataTable";
 
 interface Question {
-    isSaved: boolean;
     question: string;
     responseType: "free-text" | "multiple-choice";
     options: string[];
     allowMultiple?: boolean;
     freeTextDescription?: string;
+    isSaved?: boolean;
+    isSaving?: boolean;
+    isEditing?: boolean;
 }
 
 interface Recipient {
@@ -46,7 +48,6 @@ const initialValues: FormValues = {
     endDate: '',
     triggerWord: '',
     questions: [{
-        isSaved: false,
         question: '',
         responseType: "free-text",
         options: [],
@@ -246,11 +247,7 @@ const Page =  () => {
                             <h1 className="font-bold text-lg pb-4">Create Questions</h1>
                             <hr className="mb-6" />
 
-                            {values.questions.map((question: Question & {
-                                isSaved?: boolean;
-                                isSaving?: boolean;
-                                isEditing?: boolean;
-                            }, index: number) => (
+                            {values.questions.map((question: Question, index: number) => (
                                 <div key={index} className="mt-6">
                                     <div className="flex space-x-6 w-full">
                                         <div className='flex-1 space-y-[6px]'>
@@ -268,9 +265,9 @@ const Page =  () => {
                                             />
                                             {/*{errors.questions?.[index]?.question && touched.questions?.[index]?.question ? (*/}
                                                 <span className="text-sm text-red-500">
-                                        <ErrorMessage name={`questions[${index}].question`} />
-                                    </span>
-                                            {/*// ) : null}*/}
+                                                    <ErrorMessage name={`questions[${index}].question`} />
+                                                </span>
+                                            {/*) : null}*/}
                                         </div>
 
                                         <div className='space-y-[6px]'>
@@ -290,8 +287,8 @@ const Page =  () => {
                                             </Field>
                                             {/*{errors.questions?.[index]?.responseType && touched.questions?.[index]?.responseType ? (*/}
                                                 <span className="text-sm text-red-500">
-                                        <ErrorMessage name={`questions[${index}].responseType`} />
-                                    </span>
+                                                    <ErrorMessage name={`questions[${index}].responseType`} />
+                                                </span>
                                             {/*) : null}*/}
                                         </div>
                                     </div>
