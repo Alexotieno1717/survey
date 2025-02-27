@@ -6,7 +6,6 @@ import Table from './table';
 import {Button} from '../ui/button';
 import {Eye, Pencil, Trash} from 'lucide-react';
 import Link from 'next/link';
-import {Payment} from "@/app/dashboard/survey/questions/createsurveyquestion/columns";
 
 interface Data {
     id: number;
@@ -49,11 +48,11 @@ const data: Data[] = [
 
 
 interface DataTableProps {
-    columns?: ColumnDef<Payment>[]
+    columns?: ColumnDef<Data>[]
 }
 
 interface DataTableProps {
-    columns?: ColumnDef<Payment>[]
+    columns?: ColumnDef<Data>[]
 }
 
 export default function DataTable() {
