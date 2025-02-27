@@ -242,12 +242,12 @@ const Page =  () => {
                     <>
                         <div className=''>
                             <h1 className="font-bold text-lg pb-4">Create Questions</h1>
-                            <hr className="mb-6"/>
+                            <hr className="mb-6" />
 
                             {values.questions.map((question: Question & {
                                 isSaved?: boolean;
                                 isSaving?: boolean;
-                                isEditing?: boolean
+                                isEditing?: boolean;
                             }, index: number) => (
                                 <div key={index} className="mt-6">
                                     <div className="flex space-x-6 w-full">
@@ -265,10 +265,10 @@ const Page =  () => {
                                                 }}
                                             />
                                             {/*{errors.questions?.[index]?.question && touched.questions?.[index]?.question ? (*/}
-                                            <span className="text-sm text-red-500">
-                                                    <ErrorMessage name={`questions[${index}].question`}/>
-                                                </span>
-                                            {/*) : null}*/}
+                                                <span className="text-sm text-red-500">
+                                        <ErrorMessage name={`questions[${index}].question`} />
+                                    </span>
+                                            {/*// ) : null}*/}
                                         </div>
 
                                         <div className='space-y-[6px]'>
@@ -287,8 +287,8 @@ const Page =  () => {
                                                 <option value="multiple-choice">Multiple Choice</option>
                                             </Field>
                                             {/*{errors.questions?.[index]?.responseType && touched.questions?.[index]?.responseType ? (*/}
-                                            <span className="text-sm text-red-500">
-                                        <ErrorMessage name={`questions[${index}].responseType`}/>
+                                                <span className="text-sm text-red-500">
+                                        <ErrorMessage name={`questions[${index}].responseType`} />
                                     </span>
                                             {/*) : null}*/}
                                         </div>
@@ -300,14 +300,10 @@ const Page =  () => {
                                             <div className="mt-4">
                                                 <label className="block text-sm font-medium">Options</label>
                                                 {question.options.map((option: string, optionIndex: number) => (
-                                                    <div key={optionIndex}
-                                                         className="flex justify-between space-x-10 mt-2 items-center">
-                                                        {/* Label with numbering */}
+                                                    <div key={optionIndex} className="flex justify-between space-x-10 mt-2 items-center">
                                                         <div className="flex-1 items-center">
                                                             <div className='flex justify-between'>
-                                                                <span
-                                                                    className="text-sm font-medium">Label {optionIndex + 1}</span>
-                                                                {/* Remove button as an "X" mark with "Remove" text */}
+                                                                <span className="text-sm font-medium">Label {optionIndex + 1}</span>
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => {
@@ -328,41 +324,32 @@ const Page =  () => {
                                                             />
                                                         </div>
 
-                                                        {/* Branching input for options */}
                                                         <div className="flex-1 space-y-2">
-                                                            <label className="block text-sm font-medium">After child
-                                                                questions, go to:</label>
+                                                            <label className="block text-sm font-medium">After child questions, go to:</label>
                                                             <Field
                                                                 as="select"
                                                                 name={`questions[${index}].branching[${optionIndex}]`}
                                                                 className="w-full px-4 py-2 border rounded-md"
                                                             >
-                                                                {/* Disabled "Next Question, if added" option */}
                                                                 <option value="0" disabled className="text-gray-400">
                                                                     Next Question, if added
                                                                 </option>
-
-                                                                {/* List all created questions */}
                                                                 {values.questions.map((q: Question, qIndex: number) => (
-                                                                    qIndex !== index && ( // Exclude the current question
+                                                                    qIndex !== index && (
                                                                         <option key={qIndex} value={qIndex}>
                                                                             Question {qIndex + 1}
                                                                         </option>
                                                                     )
                                                                 ))}
-
-                                                                <option className="disabled:cursor-not-allowed"
-                                                                        value="-2" disabled={true}>-- No More Options --
+                                                                <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>
+                                                                    -- No More Options --
                                                                 </option>
-
-                                                                {/* End Survey option */}
                                                                 <option value="-1">End Survey</option>
                                                             </Field>
                                                         </div>
                                                     </div>
                                                 ))}
 
-                                                {/* Add Option button */}
                                                 <Button
                                                     type="button"
                                                     variant={'outline'}
@@ -376,7 +363,6 @@ const Page =  () => {
                                                 </Button>
                                             </div>
 
-                                            {/* Allow Multiple Options Checkbox (only for multiple-choice) */}
                                             <div className="mt-4 flex items-center space-x-2">
                                                 <Field
                                                     type="checkbox"
@@ -384,8 +370,7 @@ const Page =  () => {
                                                     id={`allowMultiple-${index}`}
                                                     className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
                                                 />
-                                                <label htmlFor={`allowMultiple-${index}`}
-                                                       className="text-sm font-medium">
+                                                <label htmlFor={`allowMultiple-${index}`} className="text-sm font-medium">
                                                     Allow participant to pick more than one option
                                                 </label>
                                             </div>
@@ -406,38 +391,31 @@ const Page =  () => {
                                     )}
 
                                     <div className='py-3 space-y-6'>
-                                        <hr/>
+                                        <hr />
                                         <div>
-                                            <label className="block text-sm font-medium">After answer has been
-                                                submitted, go to:</label>
+                                            <label className="block text-sm font-medium">After answer has been submitted, go to:</label>
                                             <Field
                                                 as="select"
                                                 name={`questions[${index}].branching`}
                                                 className="w-full px-4 py-2 border rounded-md"
                                             >
-                                                {/* Disabled "Next Question, if added" option */}
                                                 <option value="0" disabled className="text-gray-400">
                                                     Next Question, if added
                                                 </option>
-
-                                                {/* List all created questions */}
                                                 {values.questions.map((q: Question, qIndex: number) => (
-                                                    qIndex !== index && ( // Exclude the current question
+                                                    qIndex !== index && (
                                                         <option key={qIndex} value={qIndex}>
                                                             Question {qIndex + 1}
                                                         </option>
                                                     )
                                                 ))}
-
-                                                <option className="disabled:cursor-not-allowed" value="-2"
-                                                        disabled={true}>-- No questions --
+                                                <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>
+                                                    -- No questions --
                                                 </option>
-
-                                                {/* End Survey option */}
                                                 <option value="-1">End Survey</option>
                                             </Field>
                                         </div>
-                                        <hr/>
+                                        <hr />
                                     </div>
 
                                     <div className="flex items-center justify-between pt-6">
@@ -446,9 +424,8 @@ const Page =  () => {
                                             {/* Question Not Saved / Saving Question */}
                                             {(question.isEditing || !question.isSaved) && (
                                                 <div className="flex items-center space-x-2">
-                                                    <TriangleAlert className="w-4 h-4 opacity-50 text-red-500"/>
-                                                    <span
-                                                        className={question.isSaving ? "text-yellow-500" : "text-red-500"}>
+                                                    <TriangleAlert className="w-4 h-4 opacity-50 text-red-500" />
+                                                    <span className={question.isSaving ? "text-yellow-500" : "text-red-500"}>
                                             {question.isSaving ? "Saving Question..." : "Question Not Saved"}
                                         </span>
                                                 </div>
@@ -460,6 +437,12 @@ const Page =  () => {
                                                     type="button"
                                                     variant="secondary"
                                                     onClick={async () => {
+                                                        if (!question.question) {
+                                                            // Prevent saving empty questions
+                                                            setFieldValue(`questions[${index}].isEditing`, true);
+                                                            return;
+                                                        }
+
                                                         // Mark question as saving
                                                         setFieldValue(`questions[${index}].isSaving`, true);
 
@@ -482,42 +465,60 @@ const Page =  () => {
                                                     type="button"
                                                     className="rounded-full border border-gray-400 p-[0.6rem] shadow-sm hover:border-red-500 focus-visible:outline-red-700"
                                                     onClick={() => {
-                                                        const newQuestions = values.questions.filter((_: any, i: number) => i !== index);
-                                                        setFieldValue("questions", newQuestions);
+                                                        if (values.questions.length === 1) {
+                                                            // If it's the last question, reset it to an empty form
+                                                            setFieldValue("questions", [{
+                                                                question: '',
+                                                                responseType: "free-text",
+                                                                options: [],
+                                                                allowMultiple: false,
+                                                                freeTextDescription: '',
+                                                                isSaved: false,
+                                                                isSaving: false,
+                                                                isEditing: false,
+                                                            }]);
+                                                        } else {
+                                                            // Otherwise, delete the question
+                                                            const newQuestions = values.questions.filter((_, i: number) => i !== index);
+                                                            setFieldValue("questions", newQuestions);
+                                                        }
                                                     }}
                                                 >
-                                                    <Trash2 className="w-4 h-4 opacity-50"/>
+                                                    <Trash2 className="w-4 h-4 opacity-50" />
                                                 </button>
                                             )}
                                         </div>
                                     </div>
 
-                                    <hr className='mt-4'/>
+                                    <hr className='mt-4' />
                                 </div>
                             ))}
 
-                            <div className='flex justify-end items-center py-4'>
-                                <Button
-                                    type="button"
-                                    onClick={() => {
-                                        const newQuestion = {
-                                            question: '',
-                                            responseType: "free-text",
-                                            options: [],
-                                            allowMultiple: false,
-                                            freeTextDescription: '',
-                                            isSaved: false, // Default to not saved
-                                            isSaving: false, // Default to not saving
-                                            isEditing: false, // Default to not editing
-                                        };
-                                        setFieldValue("questions", [...values.questions, newQuestion]);
-                                    }}
-                                >
-                                    Add New Question
-                                </Button>
-                            </div>
+                            {/* Show "Add New Question" button only if all questions are saved */}
+                            {values.questions.every((q: Question) => q.isSaved) && (
+                                <div className='flex justify-end items-center py-4'>
+                                    <Button
+                                        type="button"
+                                        onClick={() => {
+                                            const newQuestion = {
+                                                question: '',
+                                                responseType: "free-text",
+                                                options: [],
+                                                allowMultiple: false,
+                                                freeTextDescription: '',
+                                                isSaved: false,
+                                                isSaving: false,
+                                                isEditing: false,
+                                            };
+                                            setFieldValue("questions", [...values.questions, newQuestion]);
+                                        }}
+                                    >
+                                        Add New Question
+                                    </Button>
+                                </div>
+                            )}
 
-                            <hr/>
+                            <hr />
                         </div>
                     </>
                 );
