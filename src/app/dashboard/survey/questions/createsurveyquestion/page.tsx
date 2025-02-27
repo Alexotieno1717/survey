@@ -12,6 +12,7 @@ import {Transition} from "@headlessui/react";
 import DataTable from "@/components/tables/dataTable";
 
 interface Question {
+    isSaved: boolean;
     question: string;
     responseType: "free-text" | "multiple-choice";
     options: string[];
@@ -45,6 +46,7 @@ const initialValues: FormValues = {
     endDate: '',
     triggerWord: '',
     questions: [{
+        isSaved: false,
         question: '',
         responseType: "free-text",
         options: [],
@@ -479,7 +481,7 @@ const Page =  () => {
                                                             }]);
                                                         } else {
                                                             // Otherwise, delete the question
-                                                            const newQuestions = values.questions.filter((_, i: number) => i !== index);
+                                                            const newQuestions = values.questions.filter((_: any, i: number) => i !== index);
                                                             setFieldValue("questions", newQuestions);
                                                         }
                                                     }}
