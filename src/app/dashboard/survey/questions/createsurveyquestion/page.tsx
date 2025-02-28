@@ -9,6 +9,7 @@ import {CalendarIcon, MoveLeft, MoveRight, Trash2, TriangleAlert} from "lucide-r
 import DatePicker from "@/components/common/DatePicker";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
+import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 
 interface Question {
     question: string;
@@ -100,12 +101,55 @@ const Page =  () => {
 
     const [currentStep, setCurrentStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Survey Details, 1: Questions, 2: Survey Outro, 3: Send Survey
     const [sendSurveyStep, setSendSurveyStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Add Recipients, 1: Review Recipients, 2: Invitation, 3: Send
+    const [isDisabled, setDisabled] = useState(false);
+
+    const [deleteConfirmation, setDeleteConfirmation] = useState<{
+        isOpen: boolean;
+        questionIndex: number | null;
+    }>({
+        isOpen: false,
+        questionIndex: null,
+    });
 
     const handleFormStep = (step: number) => {
         if (step < 4) {
             setCurrentStep(step);
         }
     }
+
+    const handleDeleteQuestion = (
+        values: FormikValues,
+        setFieldValue: (field: string, value: any) => void
+    ) => {
+        if (deleteConfirmation.questionIndex !== null) {
+            const newQuestions = values.questions.filter(
+                (_: Question, i: number) => i !== deleteConfirmation.questionIndex
+            );
+
+            // If it's the last question, reset it to an empty form
+            if (newQuestions.length === 0) {
+                setFieldValue("questions", [{
+                    question: '',
+                    responseType: "free-text",
+                    options: [],
+                    allowMultiple: false,
+                    freeTextDescription: '',
+                    isSaved: false,
+                    isSaving: false,
+                    isEditing: false,
+                }]);
+            } else {
+                // Otherwise, delete the question
+                setFieldValue("questions", newQuestions);
+            }
+        }
+
+        // Close the confirmation dialog
+        setDeleteConfirmation({
+            isOpen: false,
+            questionIndex: null,
+        });
+    };
 
     function RenderForm(
         touched: FormikTouched<FormikValues>,
@@ -248,247 +292,239 @@ const Page =  () => {
 
                             {values.questions.map((question: Question, index: number) => (
                                 <div key={index} className="mt-6">
-                                    <div className="flex space-x-6 w-full">
-                                        <div className='flex-1 space-y-[6px]'>
-                                            <label className="block text-sm font-medium">Question</label>
-                                            <Field
-                                                name={`questions[${index}].question`}
-                                                type="text"
-                                                className="w-full px-4 py-2 border rounded-md"
-                                                placeholder="Enter your question"
-                                                onFocus={() => {
-                                                    if (question.isSaved) {
-                                                        setFieldValue(`questions[${index}].isEditing`, true);
-                                                    }
-                                                }}
-                                            />
-                                            {/*{errors.questions?.[index]?.question && touched.questions?.[index]?.question ? (*/}
-                                                <span className="text-sm text-red-500">
-                                                    <ErrorMessage name={`questions[${index}].question`} />
-                                                </span>
-                                            {/*) : null}*/}
-                                        </div>
-
-                                        <div className='space-y-[6px]'>
-                                            <label className="block text-sm font-medium">Response Type</label>
-                                            <Field
-                                                name={`questions[${index}].responseType`}
-                                                as="select"
-                                                className="w-full px-4 py-2 border bg-white rounded-md"
-                                                onFocus={() => {
-                                                    if (question.isSaved) {
-                                                        setFieldValue(`questions[${index}].isEditing`, true);
-                                                    }
-                                                }}
-                                            >
-                                                <option value="free-text">Free Text</option>
-                                                <option value="multiple-choice">Multiple Choice</option>
-                                            </Field>
-                                            {/*{errors.questions?.[index]?.responseType && touched.questions?.[index]?.responseType ? (*/}
-                                                <span className="text-sm text-red-500">
-                                                    <ErrorMessage name={`questions[${index}].responseType`} />
-                                                </span>
-                                            {/*) : null}*/}
-                                        </div>
-                                    </div>
-
-                                    {/* Only show options input if responseType is multiple-choice */}
-                                    {question.responseType === "multiple-choice" && (
-                                        <>
-                                            <div className="mt-4">
-                                                <label className="block text-sm font-medium">Options</label>
-                                                {question.options.map((option: string, optionIndex: number) => (
-                                                    <div key={optionIndex} className="flex justify-between space-x-10 mt-2 items-center">
-                                                        <div className="flex-1 items-center">
-                                                            <div className='flex justify-between'>
-                                                                <span className="text-sm font-medium">Label {optionIndex + 1}</span>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        const newOptions = question.options.filter((_, i: number) => i !== optionIndex);
-                                                                        setFieldValue(`questions[${index}].options`, newOptions);
-                                                                    }}
-                                                                    className="text-red-500 hover:text-red-700 flex items-center space-x-1"
-                                                                >
-                                                                    <span className="text-lg">×</span>
-                                                                    <span className="text-sm">Remove</span>
-                                                                </button>
-                                                            </div>
-                                                            <Field
-                                                                name={`questions[${index}].options[${optionIndex}]`}
-                                                                type="text"
-                                                                className="w-full px-4 py-2 border rounded-md"
-                                                                placeholder={`Option ${optionIndex + 1}`}
-                                                            />
-                                                        </div>
-
-                                                        <div className="flex-1 space-y-2">
-                                                            <label className="block text-sm font-medium">After child questions, go to:</label>
-                                                            <Field
-                                                                as="select"
-                                                                name={`questions[${index}].branching[${optionIndex}]`}
-                                                                className="w-full px-4 py-2 border rounded-md"
-                                                            >
-                                                                <option value="0" disabled className="text-gray-400">
-                                                                    Next Question, if added
-                                                                </option>
-                                                                {values.questions.map((q: Question, qIndex: number) => (
-                                                                    qIndex !== index && (
-                                                                        <option key={qIndex} value={qIndex}>
-                                                                            Question {qIndex + 1}
-                                                                        </option>
-                                                                    )
-                                                                ))}
-                                                                <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>
-                                                                    -- No More Options --
-                                                                </option>
-                                                                <option value="-1">End Survey</option>
-                                                            </Field>
-                                                        </div>
-                                                    </div>
-                                                ))}
-
-                                                <Button
-                                                    type="button"
-                                                    variant={'outline'}
-                                                    onClick={() => {
-                                                        const newOptions = [...question.options, ""];
-                                                        setFieldValue(`questions[${index}].options`, newOptions);
-                                                    }}
-                                                    className="mt-4 px-4 py-2 border-blue-500 text-blue-400 hover:text-blue-500 hover:shadow-md hover:bg-white rounded-md"
-                                                >
-                                                    Add Option
-                                                </Button>
-                                            </div>
-
-                                            <div className="mt-4 flex items-center space-x-2">
-                                                <Field
-                                                    type="checkbox"
-                                                    name={`questions[${index}].allowMultiple`}
-                                                    id={`allowMultiple-${index}`}
-                                                    className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
-                                                />
-                                                <label htmlFor={`allowMultiple-${index}`} className="text-sm font-medium">
-                                                    Allow participant to pick more than one option
+                                    {/* Card container for each question */}
+                                    <div className="bg-white shadow-lg p-6 rounded-lg">
+                                        <div className="flex space-x-6 w-full">
+                                            <div className='flex-1 space-y-[6px]'>
+                                                <label className="block text-sm font-medium">
+                                                    Question {index + 1} {/* Add the question number dynamically */}
                                                 </label>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {/* Conditionally render the Explanation (Optional) input (only for free-text) */}
-                                    {question.responseType === "free-text" && (
-                                        <div className='flex-1 space-y-[6px] mt-4'>
-                                            <label className="block text-sm font-medium">Explanation (Optional)</label>
-                                            <Field
-                                                name={`questions[${index}].freeTextDescription`}
-                                                as="textarea"
-                                                className="w-full px-4 py-2 border rounded-md"
-                                                placeholder="Participants will give an open-ended answer..."
-                                            />
-                                        </div>
-                                    )}
-
-                                    <div className='py-3 space-y-6'>
-                                        <hr />
-                                        <div>
-                                            <label className="block text-sm font-medium">After answer has been submitted, go to:</label>
-                                            <Field
-                                                as="select"
-                                                name={`questions[${index}].branching`}
-                                                className="w-full px-4 py-2 border rounded-md"
-                                            >
-                                                <option value="0" disabled className="text-gray-400">
-                                                    Next Question, if added
-                                                </option>
-                                                {values.questions.map((q: Question, qIndex: number) => (
-                                                    qIndex !== index && (
-                                                        <option key={qIndex} value={qIndex}>
-                                                            Question {qIndex + 1}
-                                                        </option>
-                                                    )
-                                                ))}
-                                                <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>
-                                                    -- No questions --
-                                                </option>
-                                                <option value="-1">End Survey</option>
-                                            </Field>
-                                        </div>
-                                        <hr />
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-6">
-                                        <p className="text-center">{question.question?.length || 0} characters.</p>
-                                        <div className="flex items-center space-x-6">
-                                            {/* Question Not Saved / Saving Question */}
-                                            {(question.isEditing || !question.isSaved) && (
-                                                <div className="flex items-center space-x-2">
-                                                    <TriangleAlert className="w-4 h-4 opacity-50 text-red-500" />
-                                                    <span className={question.isSaving ? "text-yellow-500" : "text-red-500"}>
-                                            {question.isSaving ? "Saving Question..." : "Question Not Saved"}
-                                        </span>
-                                                </div>
-                                            )}
-
-                                            {/* Save Button (shown when editing or not saved) */}
-                                            {(question.isEditing || !question.isSaved) && (
-                                                <Button
-                                                    type="button"
-                                                    variant="secondary"
-                                                    onClick={async () => {
-                                                        if (!question.question) {
-                                                            // Prevent saving empty questions
+                                                <Field
+                                                    name={`questions[${index}].question`}
+                                                    type="text"
+                                                    className="w-full px-4 py-2 border rounded-md"
+                                                    placeholder="Enter your question"
+                                                    onFocus={() => {
+                                                        if (question.isSaved) {
                                                             setFieldValue(`questions[${index}].isEditing`, true);
-                                                            return;
                                                         }
-
-                                                        // Mark question as saving
-                                                        setFieldValue(`questions[${index}].isSaving`, true);
-
-                                                        // Simulate saving (e.g., API call)
-                                                        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-                                                        // Mark question as saved and not editing
-                                                        setFieldValue(`questions[${index}].isSaving`, false);
-                                                        setFieldValue(`questions[${index}].isSaved`, true);
-                                                        setFieldValue(`questions[${index}].isEditing`, false);
                                                     }}
-                                                >
-                                                    Save Question
-                                                </Button>
-                                            )}
+                                                />
+                                                {/*{errors.questions?.[index]?.question && touched.questions?.[index]?.question ? (*/}
+                                                <span className="text-sm text-red-500">
+                                        <ErrorMessage name={`questions[${index}].question`} />
+                                    </span>
+                                                {/*) : null}*/}
+                                            </div>
 
-                                            {/* Delete Icon (shown when question is saved and not editing) */}
-                                            {question.isSaved && !question.isEditing && (
-                                                <button
-                                                    type="button"
-                                                    className="rounded-full border border-gray-400 p-[0.6rem] shadow-sm hover:border-red-500 focus-visible:outline-red-700"
-                                                    onClick={() => {
-                                                        if (values.questions.length === 1) {
-                                                            // If it's the last question, reset it to an empty form
-                                                            setFieldValue("questions", [{
-                                                                question: '',
-                                                                responseType: "free-text",
-                                                                options: [],
-                                                                allowMultiple: false,
-                                                                freeTextDescription: '',
-                                                                isSaved: false,
-                                                                isSaving: false,
-                                                                isEditing: false,
-                                                            }]);
-                                                        } else {
-                                                            // Otherwise, delete the question
-                                                            const newQuestions = values.questions.filter((_: any, i: number) => i !== index);
-                                                            setFieldValue("questions", newQuestions);
+                                            <div className='space-y-[6px]'>
+                                                <label className="block text-sm font-medium">Response Type</label>
+                                                <Field
+                                                    name={`questions[${index}].responseType`}
+                                                    as="select"
+                                                    className="w-full px-4 py-2 border bg-white rounded-md"
+                                                    onFocus={() => {
+                                                        if (question.isSaved) {
+                                                            setFieldValue(`questions[${index}].isEditing`, true);
                                                         }
                                                     }}
                                                 >
-                                                    <Trash2 className="w-4 h-4 opacity-50" />
-                                                </button>
-                                            )}
+                                                    <option value="free-text">Free Text</option>
+                                                    <option value="multiple-choice">Multiple Choice</option>
+                                                </Field>
+                                                {/*{errors.questions?.[index]?.responseType && touched.questions?.[index]?.responseType ? (*/}
+                                                <span className="text-sm text-red-500">
+                                        <ErrorMessage name={`questions[${index}].responseType`} />
+                                    </span>
+                                                {/*) : null}*/}
+                                            </div>
+                                        </div>
+
+                                        {/* Only show options input if responseType is multiple-choice */}
+                                        {question.responseType === "multiple-choice" && (
+                                            <>
+                                                <div className="mt-4">
+                                                    <label className="block text-sm font-medium">Options</label>
+                                                    {question.options.map((option: string, optionIndex: number) => (
+                                                        <div key={optionIndex} className="flex justify-between space-x-10 mt-2 items-center">
+                                                            <div className="flex-1 items-center">
+                                                                <div className='flex justify-between'>
+                                                                    <span className="text-sm font-medium">Label {optionIndex + 1}</span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            const newOptions = question.options.filter((_, i: number) => i !== optionIndex);
+                                                                            setFieldValue(`questions[${index}].options`, newOptions);
+                                                                        }}
+                                                                        className="text-red-500 hover:text-red-700 flex items-center space-x-1"
+                                                                    >
+                                                                        <span className="text-lg">×</span>
+                                                                        <span className="text-sm">Remove</span>
+                                                                    </button>
+                                                                </div>
+                                                                <Field
+                                                                    name={`questions[${index}].options[${optionIndex}]`}
+                                                                    type="text"
+                                                                    className="w-full px-4 py-2 border rounded-md"
+                                                                    placeholder={`Option ${optionIndex + 1}`}
+                                                                />
+                                                            </div>
+
+                                                            <div className="flex-1 space-y-2">
+                                                                <label className="block text-sm font-medium">After child questions, go to:</label>
+                                                                <Field
+                                                                    as="select"
+                                                                    name={`questions[${index}].branching[${optionIndex}]`}
+                                                                    className="w-full px-4 py-2 border rounded-md"
+                                                                >
+                                                                    <option value="0" disabled className="text-gray-400">
+                                                                        Next Question, if added
+                                                                    </option>
+                                                                    {values.questions.map((q: Question, qIndex: number) => (
+                                                                        qIndex !== index && (
+                                                                            <option key={qIndex} value={qIndex}>
+                                                                                Question {qIndex + 1}
+                                                                            </option>
+                                                                        )
+                                                                    ))}
+                                                                    <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>
+                                                                        -- No More Options --
+                                                                    </option>
+                                                                    <option value="-1">End Survey</option>
+                                                                </Field>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+
+                                                    <Button
+                                                        type="button"
+                                                        variant={'outline'}
+                                                        onClick={() => {
+                                                            const newOptions = [...question.options, ""];
+                                                            setFieldValue(`questions[${index}].options`, newOptions);
+                                                        }}
+                                                        className="mt-4 px-4 py-2 border-blue-500 text-blue-400 hover:text-blue-500 hover:shadow-md hover:bg-white rounded-md"
+                                                    >
+                                                        Add Option
+                                                    </Button>
+                                                </div>
+
+                                                <div className="mt-4 flex items-center space-x-2">
+                                                    <Field
+                                                        type="checkbox"
+                                                        name={`questions[${index}].allowMultiple`}
+                                                        id={`allowMultiple-${index}`}
+                                                        className="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                                                    />
+                                                    <label htmlFor={`allowMultiple-${index}`} className="text-sm font-medium">
+                                                        Allow participant to pick more than one option
+                                                    </label>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {/* Conditionally render the Explanation (Optional) input (only for free-text) */}
+                                        {question.responseType === "free-text" && (
+                                            <div className='flex-1 space-y-[6px] mt-4'>
+                                                <label className="block text-sm font-medium">Explanation (Optional)</label>
+                                                <Field
+                                                    name={`questions[${index}].freeTextDescription`}
+                                                    as="textarea"
+                                                    className="w-full px-4 py-2 border rounded-md"
+                                                    placeholder="Participants will give an open-ended answer..."
+                                                    onClick={(e: any) => setDisabled(!isDisabled)}
+                                                    disabled={isDisabled}
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className='py-3 space-y-6'>
+                                            <hr />
+                                            <div>
+                                                <label className="block text-sm font-medium">After answer has been submitted, go to:</label>
+                                                <Field
+                                                    as="select"
+                                                    name={`questions[${index}].branching`}
+                                                    className="w-full px-4 py-2 border rounded-md bg-white"
+                                                >
+                                                    <option value="0" disabled className="text-gray-400">
+                                                        Next Question, if added
+                                                    </option>
+                                                    {values.questions.map((q: Question, qIndex: number) => (
+                                                        qIndex !== index && (
+                                                            <option key={qIndex} value={qIndex}>
+                                                                Question {qIndex + 1}
+                                                            </option>
+                                                        )
+                                                    ))}
+                                                    <option className="disabled:cursor-not-allowed" value="-2" disabled={true}>
+                                                        -- No questions --
+                                                    </option>
+                                                    <option value="-1">End Survey</option>
+                                                </Field>
+                                            </div>
+                                            <hr />
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-6">
+                                            <p className="text-center">{question.question?.length || 0} characters.</p>
+                                            <div className="flex items-center space-x-6">
+                                                {/* Question Not Saved / Saving Question */}
+                                                {(question.isEditing || !question.isSaved) && (
+                                                    <div className="flex items-center space-x-2">
+                                                        <TriangleAlert className="w-4 h-4 opacity-50 text-red-500" />
+                                                        <span className={question.isSaving ? "text-yellow-500" : "text-red-500"}>
+                                                {question.isSaving ? "Saving Question..." : "Question Not Saved"}
+                                            </span>
+                                                    </div>
+                                                )}
+
+                                                {/* Save Button (shown when editing or not saved) */}
+                                                {(question.isEditing || !question.isSaved) && (
+                                                    <Button
+                                                        type="button"
+                                                        variant="secondary"
+                                                        onClick={async () => {
+                                                            if (!question.question) {
+                                                                // Prevent saving empty questions
+                                                                setFieldValue(`questions[${index}].isEditing`, true);
+                                                                return;
+                                                            }
+
+                                                            // Mark question as saving
+                                                            setFieldValue(`questions[${index}].isSaving`, true);
+
+                                                            // Simulate saving (e.g., API call)
+                                                            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                                                            // Mark question as saved and not editing
+                                                            setFieldValue(`questions[${index}].isSaving`, false);
+                                                            setFieldValue(`questions[${index}].isSaved`, true);
+                                                            setFieldValue(`questions[${index}].isEditing`, false);
+                                                        }}
+                                                    >
+                                                        Save Question
+                                                    </Button>
+                                                )}
+
+                                                {/* Delete Icon (shown when question is saved and not editing) */}
+                                                {question.isSaved && !question.isEditing && (
+                                                    <button
+                                                        type="button"
+                                                        className="rounded-full border border-gray-400 p-[0.6rem] shadow-sm hover:border-red-500 focus-visible:outline-red-700"
+                                                        onClick={() => {
+                                                            setDeleteConfirmation({
+                                                                isOpen: true,
+                                                                questionIndex: index,
+                                                            });
+                                                        }}
+                                                    >
+                                                        <Trash2 className="w-4 h-4 opacity-50" />
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <hr className='mt-4' />
                                 </div>
                             ))}
 
@@ -518,6 +554,16 @@ const Page =  () => {
 
                             <hr />
                         </div>
+
+                        {/* Delete Confirmation Dialog */}
+                        <DeleteConfirmationDialog
+                            isOpen={deleteConfirmation.isOpen}
+                            onConfirm={() => handleDeleteQuestion(values, setFieldValue)}
+                            onCancel={() => setDeleteConfirmation({
+                                isOpen: false,
+                                questionIndex: null,
+                            })}
+                        />
                     </>
                 );
 
