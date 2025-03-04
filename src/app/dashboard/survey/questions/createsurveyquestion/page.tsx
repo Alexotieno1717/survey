@@ -5,7 +5,7 @@ import {ErrorMessage, Field, Form, Formik, FormikErrors, FormikTouched, FormikVa
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {cn} from "@/lib/utils";
 import {format} from "date-fns";
-import {CalendarIcon, MoveLeft, MoveRight, Trash2, TriangleAlert} from "lucide-react";
+import {CalendarIcon, Download, EditIcon, MoveLeft, MoveRight, Trash2, TriangleAlert, UserPlus} from "lucide-react";
 import DatePicker from "@/components/common/DatePicker";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
@@ -26,6 +26,7 @@ interface Question {
 interface Recipient {
     id: string;
     name: string;
+    phone: string;
     email: string;
 }
 
@@ -68,7 +69,14 @@ const initialValues: FormValues = {
         {
             'id': '1',
             'name': 'Alex Otieno',
+            'phone': '254779663469',
             'email': 'alex@example.com',
+        },
+        {
+            'id': '2',
+            'name': 'Otieno Otieno',
+            'phone': '254748815593',
+            'email': 'alexotieno@example.com',
         }
     ],
     invitationMessage: '',
@@ -646,24 +654,24 @@ const Page =  () => {
                                 <div className="flex space-x-4 mb-6">
                                     <Button
                                         type="button"
-                                        variant={"outline"}
-                                        className="flex-1"
+                                        className="bg-blue-500 hover:bg-blue-700 focus:outline-none"
                                     >
                                         Select from contacts list
                                     </Button>
+                                    <p className='flex justify-center items-center'>or</p>
                                     <Button
                                         type="button"
                                         variant={"outline"}
-                                        className="flex-1"
+                                        className=" bg-transparent border border-[#E3E5EB] shadow-sm hover:shadow-md hover:bg-transparent focus:outline-none"
                                     >
                                         Upload file
                                     </Button>
                                 </div>
 
                                 <div className="mb-6">
-                                    <label className="block text-sm text-[#25262d] font-medium">Select Survey
+                                    <label className="block text-lg  text-[#25262d] font-medium">Select Survey
                                         Participants from your contacts list</label>
-                                    <div className="mt-2">
+                                    <div className="flex flex-col">
                                         <label className="inline-flex items-center">
                                             <Field
                                                 type="radio"
@@ -673,7 +681,7 @@ const Page =  () => {
                                             />
                                             <span className="ml-2">All contacts (1)</span>
                                         </label>
-                                        <label className="inline-flex items-center ml-6">
+                                        <label className="inline-flex items-center">
                                             <Field
                                                 type="radio"
                                                 name="recipients"
@@ -689,30 +697,94 @@ const Page =  () => {
 
                     case 1: // Review Recipients
                         return (
-                            <div>
-                                <h1 className="font-bold text-lg pb-4">Review Recipients</h1>
-                                <hr className="mb-6"/>
+                            <div className=''>
+                                <div className='flex justify-between items-center mb-6'>
+                                    <div className='space-y-3'>
+                                        <h1 className="font-bold text-lg pb-4">Review Recipients</h1>
+                                        <p className='text-gray-500 text-sm font-normal'>Kindly review the recipients and rectify the ones that need fixing.</p>
+                                    </div>
+
+                                    <div className='flex space-x-4'>
+                                        <Button
+                                            type="button"
+                                            variant={"outline"}
+                                            className="flex justify-center items-center text-blue-500 space-x-2 bg-transparent border border-blue-500 shadow-sm hover:shadow-md hover:bg-transparent hover:text-blue-500 focus:outline-none"
+                                        >
+                                            <UserPlus className='w-4 h-4' />
+                                            <span>Add New Recipient</span>
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant={"outline"}
+                                            className="flex justify-center items-center text-gray-400 hover:text-gray-400 space-x-2 bg-transparent border border-[#E3E5EB] shadow-sm hover:shadow-md hover:bg-transparent focus:outline-none"
+                                        >
+                                            <Trash2 className='w-4 h-4' />
+                                            <span>Delete</span>
+                                        </Button>
+                                        <Field
+                                            name='search'
+                                            type="text"
+                                            className="px-4 py-2 border rounded-md"
+                                            placeholder="Search for recipient"
+                                        />
+                                    </div>
+                                </div>
 
                                 {/* Display recipients in a table */}
                                 <div className="">
                                     {/*<DataTable />*/}
                                 </div>
 
-                                <table className="">
+                                <table className="w-full border border-[#E3E5EB] rounded-lg shadow-md">
                                     <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                    </tr>
+                                        <tr className="bg-white text-gray-500 text-left uppercase text-sm">
+                                            <th className="px-4 py-3">
+                                                <input type="checkbox" className="w-4 h-4" />
+                                            </th>
+                                            <th className="px-4 py-3">Number</th>
+                                            <th className="px-4 py-3">Name</th>
+                                            <th className="px-4 py-3">Actions</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>Alex Otieno</td>
-                                        <td>alex@gmail.com</td>
-                                    </tr>
-
+                                        <tr className="border-t border-[#E3E5EB] bg-gray-50">
+                                            <td className="px-4 py-3">
+                                                <input type="checkbox" className="w-4 h-4" />
+                                            </td>
+                                            <td className="px-4 py-3 text-blue-500">+254748815593</td>
+                                            <td className="px-4 py-3">Alex Otieno</td>
+                                            <td className="px-4 py-3 flex space-x-2">
+                                                <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-200">
+                                                    <EditIcon className='w-4 h-4' />
+                                                </button>
+                                                <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-200">
+                                                    <Trash2 className='w-4 h-4' />
+                                                </button>
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
+
+                                <div className="flex justify-between items-center mt-4">
+                                    <div className="flex items-center space-x-2">
+                                        <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-200">
+                                            ←
+                                        </button>
+                                        <span>Page 1 of 1</span>
+                                        <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-200">
+                                            →
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <select className="border border-gray-300 p-2 rounded-md">
+                                            <option>10</option>
+                                            <option>20</option>
+                                            <option>50</option>
+                                        </select>
+                                        <span>Rows per page</span>
+                                    </div>
+                                </div>
+
                             </div>
                         );
 
@@ -762,18 +834,103 @@ const Page =  () => {
                     case 3: // Send
                         return (
                             <div>
-                                <h1 className="font-bold text-lg pb-4">Review and Send</h1>
-                                <hr className="mb-6"/>
+
+                                <div className='flex justify-between items-center mb-6'>
+                                    <div className='space-y-3'>
+                                        <h1 className="font-bold text-lg pb-4">Review and Send</h1>
+                                        <p className='text-gray-500 text-sm font-normal'>Kindly review the invitation message.</p>
+                                    </div>
+
+                                    <div className='flex space-x-4'>
+                                        <Button
+                                            type="button"
+                                            variant={"outline"}
+                                            className="flex justify-center items-center text-blue-500 space-x-2 bg-transparent border border-blue-500 shadow-sm hover:shadow-md hover:bg-transparent hover:text-blue-500 focus:outline-none"
+                                        >
+                                            <Download className='w-4 h-4' />
+                                            <span>Download CSV</span>
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant={"outline"}
+                                            className="flex justify-center items-center text-gray-400 hover:text-gray-400 space-x-2 bg-transparent border border-[#E3E5EB] shadow-sm hover:shadow-md hover:bg-transparent focus:outline-none"
+                                        >
+                                            <Trash2 className='w-4 h-4' />
+                                            <span>Delete</span>
+                                        </Button>
+                                        <Field
+                                            name='search'
+                                            type="text"
+                                            className="px-4 py-2 border rounded-md"
+                                            placeholder="Search for Messages"
+                                        />
+                                    </div>
+                                </div>
 
                                 {/* Display invitation details */}
                                 <div className="mb-6">
-                                    <h2 className="text-lg font-semibold">Invitation Message</h2>
-                                    <p>{values.invitationMessage}</p>
-                                </div>
-
-                                <div className="mb-6">
-                                    <h2 className="text-lg font-semibold">Scheduled Time</h2>
-                                    <p>{values.scheduleTime}</p>
+                                    <table className="w-full border border-[#E3E5EB] rounded-lg shadow-md">
+                                        <thead>
+                                        <tr className="bg-white text-gray-500 text-left uppercase text-sm">
+                                            <th className="px-4 py-3">
+                                                <input type="checkbox" className="w-4 h-4" />
+                                            </th>
+                                            <th className="px-4 py-3">Message</th>
+                                            <th className="px-4 py-3">Number</th>
+                                            <th className="px-4 py-3">msg count</th>
+                                            <th className="px-4 py-3">name</th>
+                                            <th className="px-4 py-3">Actions</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr className="border-t border-[#E3E5EB] bg-gray-50">
+                                            <td className="px-4 py-3">
+                                                <input type="checkbox" className="w-4 h-4" />
+                                            </td>
+                                            <td className="px-4 py-3 text-blue-500">+Reply with LARA to participate STOP*456*9*5#</td>
+                                            <td className="px-4 py-3 text-blue-500">+254748815593</td>
+                                            <td className="px-4 py-3 text-blue-500">1</td>
+                                            <td className="px-4 py-3">Alex Otieno</td>
+                                            <td className="px-4 py-3 flex space-x-2">
+                                                <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-200">
+                                                    <EditIcon className='w-4 h-4' />
+                                                </button>
+                                                <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-200">
+                                                    <Trash2 className='w-4 h-4' />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <div className="flex justify-between items-center mt-4">
+                                        <div className="flex items-center space-x-2">
+                                            <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-200">
+                                                ←
+                                            </button>
+                                            <span>Page 1 of 1</span>
+                                            <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-200">
+                                                →
+                                            </button>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <select className="border border-gray-300 p-2 rounded-md">
+                                                <option>10</option>
+                                                <option>20</option>
+                                                <option>50</option>
+                                            </select>
+                                            <span>Rows per page</span>
+                                        </div>
+                                        <div className="flex space-x-2">
+                                            <Button
+                                                type="button"
+                                                variant={"outline"}
+                                                className="flex justify-center items-center text-red-400 hover:text-red-400 space-x-2 bg-transparent border border-red-400 shadow-sm hover:shadow-md hover:bg-transparent focus:outline-none"
+                                            >
+                                                <Trash2 className='w-4 h-4' />
+                                                <span>Discard</span>
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         );
