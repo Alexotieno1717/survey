@@ -10,6 +10,8 @@ import DatePicker from "@/components/common/DatePicker";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 
 interface Question {
     question: string;
@@ -29,6 +31,7 @@ interface Recipient {
 }
 
 interface FormValues {
+    isCompletionMessageSaved?: boolean;
     surveyName: string;
     description: string;
     startDate: string;
@@ -92,6 +95,7 @@ const validationSchema = Yup.object().shape({
         })
     ),
     completionMessage: Yup.string().notRequired(),
+
 });
 
 
@@ -567,7 +571,7 @@ const Page =  () => {
                     </>
                 );
 
-            case 2:  // Survey Outro
+            case 2: // Survey Outro
                 return (
                     <>
                         <div>
@@ -592,8 +596,7 @@ const Page =  () => {
                                     setFieldValue("completionMessage", e.target.value);
                                 }}
                             />
-                            <ErrorMessage name="completionMessage" component="div"
-                                          className="text-xs pt-2 text-red-500"/>
+                            <ErrorMessage name="completionMessage" component="div" className="text-xs pt-2 text-red-500" />
 
                             {/* Character Count and Save Button */}
                             <div className="flex justify-between text-center items-center text-xs text-gray-500 mt-2">
@@ -602,6 +605,11 @@ const Page =  () => {
                                     type="button"
                                     variant={values.isCompletionMessageSaved ? "secondary" : "default"} // Blue when not saved, gray when saved
                                     onClick={async () => {
+                                        if (!values.completionMessage) {
+                                            // Prevent saving if the input is empty
+                                            return;
+                                        }
+
                                         // Mark completion message as saving
                                         setFieldValue("isSavingCompletionMessage", true);
 
@@ -612,7 +620,7 @@ const Page =  () => {
                                         setFieldValue("isSavingCompletionMessage", false);
                                         setFieldValue("isCompletionMessageSaved", true);
                                     }}
-                                    disabled={values.isCompletionMessageSaved} // Disable button after saving
+                                    disabled={values.isCompletionMessageSaved || !values.completionMessage} // Disable if saved or empty
                                 >
                                     {values.isSavingCompletionMessage ? "Saving..." : "Save Message"}
                                 </Button>
@@ -819,7 +827,7 @@ const Page =  () => {
             case 1:
                 if (
                     currentStep === 1 &&
-                    values.questions.some(question => !question.question || !question.responseType)
+                    values.questions.some(question => !question.question || !question.responseType || !question.isSaved)
                 ) {
                     values.questions.forEach((_, index) => {
                         validateField(`questions[${index}].question`);
@@ -840,12 +848,12 @@ const Page =  () => {
                 break;
 
             case 2:
-                if (!values.completionMessage) {
-                    validateField('completionMessage');
-                    setTouched({completionMessage: true}, true);
-                } else if (!errors.completionMessage) {
-                    setCurrentStep(currentStep + 1);
+                if (values.completionMessage && !values.isCompletionMessageSaved) {
+                    // Prevent moving to the next step if the completion message is not saved
+                    alert("Please save the completion message before proceeding.");
+                    return;
                 }
+                setCurrentStep(currentStep + 1);
                 break;
 
             case 3:
@@ -910,12 +918,13 @@ const Page =  () => {
                       setFieldValue,
                   }) => (
                     <>
-                        <div className="flex space-x-4">
+                        <div className="inline-flex h-9 items-center justify-center rounded-lg bg-muted  text-muted-foreground">
                             <div
-                                className={`px-4 py-2 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                                className={`
+                                inline-flex items-center justify-center whitespace-nowrap px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow border                          ${
                                     currentStep === 0
                                         ? "bg-blue-500 text-white"
-                                        : "bg-white text-gray-500 hover:bg-gray-100"
+                                        : "bg-white text-gray-500"
                                 }`}
                                 onClick={() => setCurrentStep(0)}
                             >
@@ -923,12 +932,13 @@ const Page =  () => {
                             </div>
 
                             <div
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                className={`inline-flex items-center justify-center whitespace-nowrap px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow border
+                                    ${
                                     currentStep === 1
                                         ? "bg-blue-500 text-white"
                                         : isStep0Complete(values)
-                                            ? "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                            ? "bg-white text-gray-500 cursor-pointer"
+                                            : "text-gray-400 cursor-not-allowed"
                                 }`}
                                 onClick={() => {
                                     if (isStep0Complete(values)) {
@@ -940,12 +950,13 @@ const Page =  () => {
                             </div>
 
                             <div
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                className={`inline-flex items-center justify-center whitespace-nowrap px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow border
+                                    ${
                                     currentStep === 2
                                         ? "bg-blue-500 text-white"
                                         : isStep1Complete(values)
-                                            ? "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                            ? "bg-white text-gray-500 cursor-pointer"
+                                            : "text-gray-400 cursor-not-allowed"
                                 }`}
                                 onClick={() => {
                                     if (isStep1Complete(values)) {
@@ -957,12 +968,13 @@ const Page =  () => {
                             </div>
 
                             <div
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                                className={`inline-flex items-center justify-center whitespace-nowrap px-3 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow border
+                                    ${
                                     currentStep === 3
                                         ? "bg-blue-500 text-white"
                                         : isStep2Complete(values)
-                                            ? "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                            ? "bg-white text-gray-500 cursor-pointer"
+                                            : "text-gray-400 cursor-not-allowed"
                                 }`}
                                 onClick={() => {
                                     if (isStep2Complete(values)) {
