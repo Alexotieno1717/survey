@@ -10,8 +10,7 @@ import DatePicker from "@/components/common/DatePicker";
 import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+import StepNavigation from "@/components/steps/StepNavigation";
 
 interface Question {
     question: string;
@@ -29,6 +28,13 @@ interface Recipient {
     name: string;
     email: string;
 }
+
+const steps = [
+    { id: 1, label: "Add Recipients" },
+    { id: 2, label: "Review Recipients" },
+    { id: 3, label: "Invitation" },
+    { id: 4, label: "Send" },
+];
 
 interface FormValues {
     isCompletionMessageSaved?: boolean;
@@ -987,51 +993,11 @@ const Page =  () => {
                         </div>
 
                         {currentStep === 3 && (
-                            <div className="flex space-x-4 mt-4">
-                                <div
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        sendSurveyStep === 0
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                    }`}
-                                    onClick={() => setSendSurveyStep(0)}
-                                >
-                                    Add Recipients
-                                </div>
-
-                                <div
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        sendSurveyStep === 1
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                    }`}
-                                    onClick={() => setSendSurveyStep(1)}
-                                >
-                                    Review Recipients
-                                </div>
-
-                                <div
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        sendSurveyStep === 2
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                    }`}
-                                    onClick={() => setSendSurveyStep(2)}
-                                >
-                                    Invitation
-                                </div>
-
-                                <div
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        sendSurveyStep === 3
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-white text-gray-500 hover:bg-gray-100 cursor-pointer"
-                                    }`}
-                                    onClick={() => setSendSurveyStep(3)}
-                                >
-                                    Send
-                                </div>
-                            </div>
+                            <StepNavigation
+                                steps={steps}
+                                currentStep={sendSurveyStep}
+                                onStepClick={(step) => setSendSurveyStep(step)}
+                            />
                         )}
 
                         <Form className='bg-white p-6'>
