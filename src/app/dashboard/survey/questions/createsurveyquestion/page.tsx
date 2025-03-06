@@ -1,5 +1,5 @@
 "use client"
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button} from "@/components/ui/button";
 import {ErrorMessage, Field, Form, Formik, FormikErrors, FormikTouched, FormikValues} from "formik";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
@@ -11,6 +11,7 @@ import * as Yup from "yup";
 import {Transition} from "@headlessui/react";
 import DeleteConfirmationDialog from '@/components/ui/DeleteConfirmationDialog';
 import StepNavigation from "@/components/steps/StepNavigation";
+import AddContactsModal from "@/components/survey/AddContactsModal";
 
 interface Question {
     question: string;
@@ -65,20 +66,7 @@ const initialValues: FormValues = {
         freeTextDescription: '',
     }],
     completionMessage: '',
-    recipients: [
-        {
-            'id': '1',
-            'name': 'Alex Otieno',
-            'phone': '254779663469',
-            'email': 'alex@example.com',
-        },
-        {
-            'id': '2',
-            'name': 'Otieno Otieno',
-            'phone': '254748815593',
-            'email': 'alexotieno@example.com',
-        }
-    ],
+    recipients: [],
     invitationMessage: '',
     scheduleTime: '',
 };
@@ -119,7 +107,9 @@ const Page =  () => {
 
     const [currentStep, setCurrentStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Survey Details, 1: Questions, 2: Survey Outro, 3: Send Survey
     const [sendSurveyStep, setSendSurveyStep] = useState<0 | 1 | 2 | 3 | number>(0); // 0: Add Recipients, 1: Review Recipients, 2: Invitation, 3: Send
+    const [contacts, setContacts] = useState<Recipient[]>([]);
     const [isDisabled, setDisabled] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [deleteConfirmation, setDeleteConfirmation] = useState<{
         isOpen: boolean;
@@ -134,6 +124,19 @@ const Page =  () => {
             setCurrentStep(step);
         }
     }
+
+    // fetch contact from the json file
+    useEffect(() => {
+        fetch('/contacts.json')
+            .then((response) => response.json())
+            .then((data) =>{
+                setContacts(data.contacts); // Set the contacts state
+                console.log(data.contacts); // Set the contacts state
+            })
+            .catch((error) => {
+                console.error('Error fetching contacts:', error);
+            })
+    }, [])
 
     const handleDeleteQuestion = (
         values: FormikValues,
@@ -679,7 +682,7 @@ const Page =  () => {
                                                 value="all"
                                                 className="form-radio"
                                             />
-                                            <span className="ml-2">All contacts (1)</span>
+                                            <span className="ml-2">All contacts ( {contacts.length || 0} ) </span>
                                         </label>
                                         <label className="inline-flex items-center">
                                             <Field
@@ -698,16 +701,40 @@ const Page =  () => {
                     case 1: // Review Recipients
                         return (
                             <div className=''>
-                                <div className='flex justify-between items-center mb-6'>
+                                <div className='flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 space-y-4 lg:space-y-0'>
                                     <div className='space-y-3'>
                                         <h1 className="font-bold text-lg pb-4">Review Recipients</h1>
                                         <p className='text-gray-500 text-sm font-normal'>Kindly review the recipients and rectify the ones that need fixing.</p>
                                     </div>
 
                                     <div className='flex space-x-4'>
+
+                                        {/* Render the AddContactsModal */}
+                                        <AddContactsModal
+                                            isOpen={isModalOpen}
+                                            onClose={() => setIsModalOpen(false)}
+                                            onAddRecipient={(newRecipient) => {
+                                                const recipientWithId = {
+                                                    ...newRecipient,
+                                                    id: String(contacts.length + 1), // Generate a unique ID
+                                                };
+
+                                                // Update the contacts state
+                                                setContacts([...contacts, recipientWithId]);
+
+                                                // Update the Formik recipients field
+                                                setFieldValue('recipients', [...values.recipients, recipientWithId]);
+
+                                                // Close the modal
+                                                setIsModalOpen(false);
+                                            }}
+                                        />
+
+                                        {/* Button to open the modal */}
                                         <Button
                                             type="button"
                                             variant={"outline"}
+                                            onClick={() => setIsModalOpen(true)}
                                             className="flex justify-center items-center text-blue-500 space-x-2 bg-transparent border border-blue-500 shadow-sm hover:shadow-md hover:bg-transparent hover:text-blue-500 focus:outline-none"
                                         >
                                             <UserPlus className='w-4 h-4' />
@@ -731,28 +758,25 @@ const Page =  () => {
                                 </div>
 
                                 {/* Display recipients in a table */}
-                                <div className="">
-                                    {/*<DataTable />*/}
-                                </div>
-
                                 <table className="w-full border border-[#E3E5EB] rounded-lg shadow-md">
                                     <thead>
-                                        <tr className="bg-white text-gray-500 text-left uppercase text-sm">
-                                            <th className="px-4 py-3">
-                                                <input type="checkbox" className="w-4 h-4" />
-                                            </th>
-                                            <th className="px-4 py-3">Number</th>
-                                            <th className="px-4 py-3">Name</th>
-                                            <th className="px-4 py-3">Actions</th>
-                                        </tr>
+                                    <tr className="bg-white text-gray-500 text-left uppercase text-sm">
+                                        <th className="px-4 py-3">
+                                            <input type="checkbox" className="w-4 h-4" />
+                                        </th>
+                                        <th className="px-4 py-3">Number</th>
+                                        <th className="px-4 py-3">Name</th>
+                                        <th className="px-4 py-3">Actions</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="border-t border-[#E3E5EB] bg-gray-50">
+                                    {contacts.map((contact: Recipient) => (
+                                        <tr key={contact.id} className="border-t border-[#E3E5EB] bg-gray-50">
                                             <td className="px-4 py-3">
                                                 <input type="checkbox" className="w-4 h-4" />
                                             </td>
-                                            <td className="px-4 py-3 text-blue-500">+254748815593</td>
-                                            <td className="px-4 py-3">Alex Otieno</td>
+                                            <td className="px-4 py-3 text-blue-500">{contact.phone}</td>
+                                            <td className="px-4 py-3">{contact.name}</td>
                                             <td className="px-4 py-3 flex space-x-2">
                                                 <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-200">
                                                     <EditIcon className='w-4 h-4' />
@@ -762,6 +786,7 @@ const Page =  () => {
                                                 </button>
                                             </td>
                                         </tr>
+                                    ))}
                                     </tbody>
                                 </table>
 
@@ -784,7 +809,6 @@ const Page =  () => {
                                         <span>Rows per page</span>
                                     </div>
                                 </div>
-
                             </div>
                         );
 
@@ -835,7 +859,7 @@ const Page =  () => {
                         return (
                             <div>
 
-                                <div className='flex justify-between items-center mb-6'>
+                                <div className='flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 space-y-4 lg:space-y-0'>
                                     <div className='space-y-3'>
                                         <h1 className="font-bold text-lg pb-4">Review and Send</h1>
                                         <p className='text-gray-500 text-sm font-normal'>Kindly review the invitation message.</p>
@@ -887,7 +911,7 @@ const Page =  () => {
                                             <td className="px-4 py-3">
                                                 <input type="checkbox" className="w-4 h-4" />
                                             </td>
-                                            <td className="px-4 py-3 text-blue-500">+Reply with LARA to participate STOP*456*9*5#</td>
+                                            <td className="px-4 py-3 text-blue-500">+Reply with START to participate STOP*000*2*1#</td>
                                             <td className="px-4 py-3 text-blue-500">+254748815593</td>
                                             <td className="px-4 py-3 text-blue-500">1</td>
                                             <td className="px-4 py-3">Alex Otieno</td>

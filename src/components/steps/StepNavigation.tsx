@@ -1,3 +1,5 @@
+import React from "react";
+
 interface Step {
     id: number;
     label: string;
@@ -11,12 +13,12 @@ interface StepNavigationProps {
 
 const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep, onStepClick }) => {
     return (
-        <div className="flex ml-12 items-center bg-white p-4 rounded-lg shadow">
+        <div className="flex lg:ml-12 items-center lg:bg-white lg:p-4 lg:rounded-lg lg:shadow">
             {steps.map((step, index) => (
                 <div key={step.id} className="flex items-center">
                     {/* Step Number */}
                     <div
-                        className={`w-10 h-10 flex items-center justify-center rounded-full text-sm font-semibold transition-colors 
+                        className={`w-8 h-8 lg:w-10 lg:h-10 flex items-center justify-center rounded-full text-sm font-semibold transition-colors cursor-pointer
                             ${
                             currentStep === index
                                 ? "bg-blue-600 text-white border-2 border-blue-600"
@@ -39,7 +41,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({ steps, currentStep, onS
                     {/* Connector Line */}
                     {index < steps.length - 1 && (
                         <div
-                            className={`w-10 h-[2px] ${
+                            className={`w-8 lg:w-10 h-[2px] ${
                                 currentStep > index ? "bg-blue-600" : "bg-gray-300"
                             }`}
                             onClick={() => onStepClick(index)}
